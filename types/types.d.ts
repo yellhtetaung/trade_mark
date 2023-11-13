@@ -71,33 +71,33 @@ export interface User {
 }
 
 export interface TradeMark {
-    id?: number | null;
-    trademark: string | null;
-    trademark_sample: string | null;
-    applicant: string | null;
-    address: string | null;
-    classes: string | null;
-    goods_services: string | null;
-    no_ent_reg_cer: string | null;
-    nonlatin_char_trans: string | null;
-    trans_mean: string | null;
-    color_claim: string | null;
-    re_filling_date: Date | null;
-    re_filling_WIPO_no: string | null;
-    app_no: string | null;
-    off_fill_date: Date | null;
-    payment_WIPO_no: string | null;
-    other_procedure: string | null;
-    granting_date: Date | null;
-    reg_no: string | null;
-    time_renewal: string | null;
-    renewal_date: Date | null;
-    renewal_no: string | null;
-    val_period: Date | null;
-    date_of_public: Date | null;
-    exp_date: Date | null;
-    reason_exp: string | null;
-    tm2: string | null;
+    id?: number | undefined;
+    trademark: string | undefined;
+    trademark_sample: string | undefined;
+    applicant: string | undefined;
+    address: string | undefined;
+    classes: string | undefined;
+    goods_services: string | undefined;
+    no_ent_reg_cer: string | undefined;
+    nonlatin_char_trans: string | undefined;
+    trans_mean: string | undefined;
+    color_claim: string | undefined;
+    re_filling_date: Date | undefined;
+    re_filling_WIPO_no: string | undefined;
+    app_no: string | undefined;
+    off_fill_date: Date | undefined;
+    payment_WIPO_no: string | undefined;
+    other_procedure: string | undefined;
+    granting_date: Date | undefined;
+    reg_no: string | undefined;
+    time_renewal: string | undefined;
+    renewal_date: Date | undefined;
+    renewal_no: string | undefined;
+    val_period: Date | undefined;
+    date_of_public: Date | undefined;
+    exp_date: Date | undefined;
+    reason_exp: string | undefined;
+    tm2: string | undefined;
 }
 
 export type ChangeHandler = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
