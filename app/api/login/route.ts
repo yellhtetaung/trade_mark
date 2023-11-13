@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
             message: 'Login Successfully',
             success: true
         });
-        response.cookies.set('token', '1234567890');
+        response.cookies.set({ name: 'token', value: '1234567890', httpOnly: true });
 
         return response;
     } catch (err: any) {
