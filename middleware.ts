@@ -8,5 +8,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/auth', '/', '/users/create-users', '/users', '/trade-mark', '/trade-mark/create-trade-mark']
+    matcher: ['/auth', '/', '/users/create-users', '/users', '/trade-mark', '/trade-mark/create-trade-mark', '/record']
 };
