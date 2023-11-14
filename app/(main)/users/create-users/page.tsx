@@ -41,7 +41,7 @@ const CreateUsers = () => {
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="password">Password</label>
-                        <Password id="password" name="password" value={user.password} onChange={onChangeHandler} toggleMask={true} />
+                        <Password inputId="password" name="password" value={user.password} onChange={onChangeHandler} toggleMask={true} />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="phoneNumber">Phone Number</label>
