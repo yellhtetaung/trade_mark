@@ -9,6 +9,8 @@ import { LayoutContext } from '../../../../layout/context/layoutcontext';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 
+import axios from 'axios';
+
 const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [checked, setChecked] = useState(false);
@@ -18,10 +20,8 @@ const LoginPage = () => {
     const containerClassName = classNames('surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden', { 'p-input-filled': layoutConfig.inputStyle === 'filled' });
 
     const signIn = async () => {
-        const res = await fetch('/api/login', { method: 'GET' });
-        const data = await res.json();
-
-        if (data.success) {
+        const res = await axios.post('/api/login', { withCredentials: true });
+        if (res.data.success) {
             router.push('/');
         }
     };
