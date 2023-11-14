@@ -3,16 +3,16 @@
 import React, { useState } from 'react';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import { DataTable } from 'primereact/datatable';
 import { Column, ColumnBodyOptions } from 'primereact/column';
 
-import { TradeMark } from '../../../../types/types';
-import { InputText } from 'primereact/inputtext';
-import { Calendar } from 'primereact/calendar';
+import { TradeMark } from '../../../../../types/types';
 import { Button } from 'primereact/button';
 
 const SearchRecord = () => {
+    const router = useRouter();
     const [data, setData] = useState<TradeMark[]>([
         {
             id: 1,
@@ -182,16 +182,7 @@ const SearchRecord = () => {
 
     const renderHeader = () => {
         return (
-            <div className="md:flex justify-content-between">
-                <div className="flex flex-wrap gap-5">
-                    <InputText placeholder="Name / Trade Mark" />
-                    <InputText placeholder="Applicant" />
-                    <Calendar dateFormat="mm/dd/yy" showIcon={true} placeholder="Register Date" />
-                    <div className="flex justify-content-end align-items-center">
-                        <Button label="Search" icon="pi pi-fw pi-search" />
-                    </div>
-                </div>
-
+            <div className="md:flex justify-content-end">
                 <div className="flex align-items-center gap-3">
                     <Button icon="pi pi-fw pi-print" rounded={true} />
                     <Button icon="pi pi-fw pi-file-export" rounded={true} severity="warning" />
@@ -202,7 +193,10 @@ const SearchRecord = () => {
 
     return (
         <div>
-            <h1 className="text-4xl font-bold">Search Record</h1>
+            <div className="flex align-items-center gap-4 mb-5">
+                <Button icon="pi pi-fw pi-arrow-left" rounded={true} onClick={() => router.back()} />
+                <span className="text-4xl font-bold">Result Images</span>
+            </div>
 
             <div className="card">
                 <DataTable value={data} tableStyle={{ minWidth: '300rem' }} header={renderHeader} showGridlines={true}>

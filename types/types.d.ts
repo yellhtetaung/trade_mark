@@ -101,3 +101,8 @@ export interface TradeMark {
 }
 
 export type ChangeHandler = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
+
+export interface Category {
+    name: string;
+    key: string;
+}

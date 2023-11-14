@@ -35,7 +35,10 @@ const AppMenu = () => {
         },
         {
             label: 'Record',
-            items: [{ label: 'Search Record Form', icon: 'pi pi-fw pi-search', to: '/record/search-record' }]
+            items: [
+                { label: 'Search Record', icon: 'pi pi-fw pi-search', to: '/record/search-record' },
+                { label: 'Search Image', icon: 'pi pi-fw pi-image', to: '/record/search-image' }
+            ]
         }
     ];
 
