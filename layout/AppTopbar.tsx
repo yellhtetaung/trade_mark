@@ -1,12 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { classNames } from 'primereact/utils';
 import React, { forwardRef, useContext, useImperativeHandle, useRef } from 'react';
 import { AppTopbarRef } from '../types/types';
 import { LayoutContext } from './context/layoutcontext';
 
+import axios from 'axios';
+
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
+    const router = useRouter();
     const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } = useContext(LayoutContext);
     const menubuttonRef = useRef(null);
     const topbarmenuRef = useRef(null);
@@ -17,6 +21,13 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
         topbarmenu: topbarmenuRef.current,
         topbarmenubutton: topbarmenubuttonRef.current
     }));
+
+    const singOut = async () => {
+        const res = await axios.post('/api/sign-out', { withCredentials: true });
+        if (res.data.success) {
+            router.push('/');
+        }
+    };
 
     return (
         <div className="layout-topbar">
@@ -42,12 +53,9 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
                     <i className="pi pi-user"></i>
                     <span>Profile</span>
                 </button>
-                <Link href="/documentation">
-                    <button type="button" className="p-link layout-topbar-button">
-                        <i className="pi pi-cog"></i>
-                        <span>Settings</span>
-                    </button>
-                </Link>
+                <button type="button" className="p-link layout-topbar-button" onClick={singOut}>
+                    <i className="pi pi-sign-out"></i>
+                </button>
             </div>
         </div>
     );
