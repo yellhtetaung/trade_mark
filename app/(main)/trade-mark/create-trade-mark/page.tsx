@@ -55,7 +55,7 @@ const CreateTradeMark = () => {
                         <InputText id="trademark" name="trademark" type="text" value={tradeMark.trademark} onChange={onChangeHandler} />
                     </div>
                     <div className="field col-12">
-                        <label htmlFor="trademark_sample">Trade Mark Sample</label>
+                        <label>Trade Mark Sample</label>
                         <FileUpload accept="image/*" id="trademark_sample" name="trademark_sample" />
                     </div>
                     <div className="field col-12">
@@ -92,7 +92,7 @@ const CreateTradeMark = () => {
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="re_filling_date">Re-filling Date</label>
-                        <Calendar id="re_filling_date" name="re_filling_date" dateFormat="mm/dd/yy" showIcon={true} />
+                        <Calendar inputId="re_filling_date" name="re_filling_date" dateFormat="mm/dd/yy" showIcon={true} />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="re_filling_WIPO_no">Re-filling WIPO No</label>
@@ -105,7 +105,7 @@ const CreateTradeMark = () => {
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="off_fill_date">Offical Filling Date</label>
-                        <Calendar id="off_fill_date" name="off_fill_date" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar inputId="off_fill_date" name="off_fill_date" dateFormat="mm/dd/yyyy" showIcon={true} />
                     </div>
 
                     <div className="field col-12 md:col-6">
@@ -120,7 +120,7 @@ const CreateTradeMark = () => {
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="granting_date">Granting Date</label>
-                        <Calendar id="granting_date" name="granting_date" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar inputId="granting_date" name="granting_date" dateFormat="mm/dd/yyyy" showIcon={true} />
                     </div>
 
                     <div className="field col-12 md:col-6">
@@ -135,7 +135,7 @@ const CreateTradeMark = () => {
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="renewal_date">Renewal Date</label>
-                        <Calendar id="renewal_date" name="renewal_date" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar inputId="renewal_date" name="renewal_date" dateFormat="mm/dd/yyyy" showIcon={true} />
                     </div>
 
                     <div className="field col-12 md:col-6">
@@ -145,17 +145,17 @@ const CreateTradeMark = () => {
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="val_period">Validity Period</label>
-                        <Calendar id="val_period" name="val_period" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar inputId="val_period" name="val_period" dateFormat="mm/dd/yyyy" showIcon={true} />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="date_of_public">Date of publication</label>
-                        <Calendar id="date_of_public" name="date_of_public" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar inputId="date_of_public" name="date_of_public" dateFormat="mm/dd/yyyy" showIcon={true} />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="exp_date">Expiration Date</label>
-                        <Calendar id="exp_date" name="exp_date" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar inputId="exp_date" name="exp_date" dateFormat="mm/dd/yyyy" showIcon={true} />
                     </div>
 
                     <div className="field col-12 md:col-6">

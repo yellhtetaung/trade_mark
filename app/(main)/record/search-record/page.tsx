@@ -159,7 +159,7 @@ const SearchRecord = () => {
         { field: 'tm2', header: 'TM 2' }
     ];
 
-    const imageBodyTemplate = (data: string) => <Image src={data} width={80} height={50} alt={data} />;
+    const imageBodyTemplate = (data: string) => <Image src={data} width={80} height={50} alt={data} className="shadow-2 border-round" />;
 
     const dateBodyTemplate = (data: Date) => <time suppressHydrationWarning={true}>{data.toLocaleDateString()}</time>;
 
