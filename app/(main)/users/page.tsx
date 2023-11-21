@@ -11,7 +11,6 @@ import { Dropdown } from 'primereact/dropdown';
 import { axiosInstance } from '../../../axiosInstance';
 import { InputText } from 'primereact/inputtext';
 import { User } from '../../../types/types';
-import { Button } from 'primereact/button';
 
 type FilteredValue = 'username' | 'email' | 'null';
 
