@@ -147,8 +147,7 @@ const Users = () => {
                     name="search"
                     value={searchField}
                     onChange={(e) => {
-                        if (e.target.value === '' && filteredValue !== 'null') {
-                            setFilteredValue('null');
+                        if (e.target.value === '') {
                             setPage(0);
                             setFirst(0);
                         }
@@ -158,6 +157,19 @@ const Users = () => {
                     }}
                     type="search"
                     placeholder="Search..."
+                />
+                <Button
+                    label="Clear"
+                    icon="pi pi-filter-slash"
+                    severity="danger"
+                    onClick={() => {
+                        if (filteredValue !== 'null' || searchField !== '') {
+                            setFilteredValue('null');
+                            setPage(0);
+                            setFirst(0);
+                            setSearchField('');
+                        }
+                    }}
                 />
             </div>
         );
