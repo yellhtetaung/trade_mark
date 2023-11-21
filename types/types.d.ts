@@ -62,12 +62,14 @@ export type {
 };
 
 export interface User {
+    id?: string;
     username: string;
     email: string;
     password: string;
     phoneNumber: string;
     nrc: string;
     address: string;
+    active?: boolean;
 }
 
 export interface TradeMark {
