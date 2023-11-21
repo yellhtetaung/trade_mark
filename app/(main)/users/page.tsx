@@ -11,6 +11,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { axiosInstance } from '../../../axiosInstance';
 import { InputText } from 'primereact/inputtext';
 import { User } from '../../../types/types';
+import { Button } from 'primereact/button';
 
 type FilteredValue = 'username' | 'email' | 'null';
 
@@ -146,8 +147,7 @@ const Users = () => {
                     name="search"
                     value={searchField}
                     onChange={(e) => {
-                        if (e.target.value === '' && filteredValue !== 'null') {
-                            setFilteredValue('null');
+                        if (e.target.value === '') {
                             setPage(0);
                             setFirst(0);
                         }
@@ -157,6 +157,19 @@ const Users = () => {
                     }}
                     type="search"
                     placeholder="Search..."
+                />
+                <Button
+                    label="Clear"
+                    icon="pi pi-filter-slash"
+                    severity="danger"
+                    onClick={() => {
+                        if (filteredValue !== 'null' || searchField !== '') {
+                            setFilteredValue('null');
+                            setPage(0);
+                            setFirst(0);
+                            setSearchField('');
+                        }
+                    }}
                 />
             </div>
         );
