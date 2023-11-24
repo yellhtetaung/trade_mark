@@ -72,10 +72,16 @@ export interface User {
     active?: boolean;
 }
 
+export type SubmittionType = {
+    Mark: boolean;
+    OldMark: boolean;
+    ReRegistration: boolean;
+};
+
 export interface TradeMark {
     id?: number | undefined;
     trademark: string | undefined;
-    trademark_sample: string | undefined;
+    trademark_sample: File | string | undefined;
     applicant: string | undefined;
     address: string | undefined;
     classes: string | undefined;
@@ -100,6 +106,7 @@ export interface TradeMark {
     exp_date: Date | undefined;
     reason_exp: string | undefined;
     tm2: string | undefined;
+    submittion_type: SubmittionType;
 }
 
 export type ChangeHandler = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
