@@ -17,7 +17,7 @@ type FilteredValue = 'username' | 'email' | 'null';
 
 const Users = () => {
     const [users, setUsers] = useState<User[] | undefined>();
-    const [totalRecord, setTotalRecord] = useState(0);
+    const [totalRecord, setTotalRecord] = useState<number>(0);
     const toastRef = useRef<any | null>(null);
 
     const [rows, setRows] = useState<number>(10);

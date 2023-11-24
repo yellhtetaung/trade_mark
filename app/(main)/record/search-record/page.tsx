@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
@@ -11,126 +11,15 @@ import { TradeMark } from '../../../../types/types';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
+import { axiosInstance } from '../../../../axiosInstance';
 
 const SearchRecord = () => {
-    const [data, setData] = useState<TradeMark[]>([
-        {
-            id: 1,
-            trademark: 'bravo',
-            trademark_sample: 'https://www.echolive.ie/cms_media/module_img/6380/3190244_3_articlesmall_iStock-1368434985_1_.jpg',
-            applicant: 'MA HOA TRADING COMPANY LIMITED',
-            address: 'No.118 Lo Sieu Stree, Ward 12, District 11, Ho Chi Minh City',
-            classes: '34',
-            goods_services: 'Cigarette',
-            no_ent_reg_cer: '0301127602',
-            nonlatin_char_trans: undefined,
-            trans_mean: undefined,
-            color_claim: undefined,
-            re_filling_date: new Date(),
-            re_filling_WIPO_no: 'WTF2020000687',
-            app_no: 'T/2020/02097',
-            off_fill_date: new Date(),
-            payment_WIPO_no: 'WFU20235425',
-            other_procedure: undefined,
-            granting_date: new Date(),
-            reg_no: undefined,
-            time_renewal: undefined,
-            renewal_date: new Date(),
-            renewal_no: undefined,
-            val_period: new Date(),
-            date_of_public: new Date(),
-            exp_date: new Date(),
-            reason_exp: undefined,
-            tm2: undefined
-        },
-        {
-            id: 2,
-            trademark: 'bravo',
-            trademark_sample: 'https://www.echolive.ie/cms_media/module_img/6380/3190244_3_articlesmall_iStock-1368434985_1_.jpg',
-            applicant: 'MA HOA TRADING COMPANY LIMITED',
-            address: 'No.118 Lo Sieu Stree, Ward 12, District 11, Ho Chi Minh City',
-            classes: '34',
-            goods_services: 'Cigarette',
-            no_ent_reg_cer: '0301127602',
-            nonlatin_char_trans: undefined,
-            trans_mean: undefined,
-            color_claim: undefined,
-            re_filling_date: new Date(),
-            re_filling_WIPO_no: 'WTF2020000687',
-            app_no: 'T/2020/02097',
-            off_fill_date: new Date(),
-            payment_WIPO_no: 'WFU20235425',
-            other_procedure: undefined,
-            granting_date: new Date(),
-            reg_no: undefined,
-            time_renewal: undefined,
-            renewal_date: new Date(),
-            renewal_no: undefined,
-            val_period: new Date(),
-            date_of_public: new Date(),
-            exp_date: new Date(),
-            reason_exp: undefined,
-            tm2: undefined
-        },
-        {
-            id: 3,
-            trademark: 'bravo',
-            trademark_sample: 'https://www.echolive.ie/cms_media/module_img/6380/3190244_3_articlesmall_iStock-1368434985_1_.jpg',
-            applicant: 'MA HOA TRADING COMPANY LIMITED',
-            address: 'No.118 Lo Sieu Stree, Ward 12, District 11, Ho Chi Minh City',
-            classes: '34',
-            goods_services: 'Cigarette',
-            no_ent_reg_cer: '0301127602',
-            nonlatin_char_trans: undefined,
-            trans_mean: undefined,
-            color_claim: undefined,
-            re_filling_date: new Date(),
-            re_filling_WIPO_no: 'WTF2020000687',
-            app_no: 'T/2020/02097',
-            off_fill_date: new Date(),
-            payment_WIPO_no: 'WFU20235425',
-            other_procedure: undefined,
-            granting_date: new Date(),
-            reg_no: undefined,
-            time_renewal: undefined,
-            renewal_date: new Date(),
-            renewal_no: undefined,
-            val_period: new Date(),
-            date_of_public: new Date(),
-            exp_date: new Date(),
-            reason_exp: undefined,
-            tm2: undefined
-        },
-        {
-            id: 4,
-            trademark: 'bravo',
-            trademark_sample: 'https://www.echolive.ie/cms_media/module_img/6380/3190244_3_articlesmall_iStock-1368434985_1_.jpg',
-            applicant: 'MA HOA TRADING COMPANY LIMITED',
-            address: 'No.118 Lo Sieu Stree, Ward 12, District 11, Ho Chi Minh City',
-            classes: '34',
-            goods_services: 'Cigarette',
-            no_ent_reg_cer: '0301127602',
-            nonlatin_char_trans: undefined,
-            trans_mean: undefined,
-            color_claim: undefined,
-            re_filling_date: new Date(),
-            re_filling_WIPO_no: 'WTF2020000687',
-            app_no: 'T/2020/02097',
-            off_fill_date: new Date(),
-            payment_WIPO_no: 'WFU20235425',
-            other_procedure: undefined,
-            granting_date: new Date(),
-            reg_no: undefined,
-            time_renewal: undefined,
-            renewal_date: new Date(),
-            renewal_no: undefined,
-            val_period: new Date(),
-            date_of_public: new Date(),
-            exp_date: new Date(),
-            reason_exp: undefined,
-            tm2: undefined
-        }
-    ]);
+    const [data, setData] = useState<TradeMark[] | undefined>();
+    const [totalData, setTotalData] = useState<number>(0);
+
+    const [rows, setRows] = useState<number>(10);
+    const [first, setFirst] = useState<number>(0);
+    const [page, setPage] = useState<number>(0);
 
     const column = [
         { field: 'id', header: 'ID' },
@@ -162,7 +51,7 @@ const SearchRecord = () => {
         { field: 'tm2', header: 'TM 2' }
     ];
 
-    const imageBodyTemplate = (data: string) => <Image src={data} width={80} height={50} alt={data} className="shadow-2 border-round" />;
+    const imageBodyTemplate = (data: string) => <Image src={data} width={80} height={50} alt={data} className="shadow-2 border-round" objectFit="contain" />;
 
     const dateBodyTemplate = (data: Date) => <time suppressHydrationWarning={true}>{data.toLocaleDateString()}</time>;
 
@@ -172,11 +61,11 @@ const SearchRecord = () => {
         if (value === undefined) {
             return <p>No data available</p>;
         } else if (typeof value === 'object') {
-            return dateBodyTemplate(value);
+            return dateBodyTemplate(value as Date);
         } else if (value === data.trademark_sample) {
-            return imageBodyTemplate(data.trademark_sample);
+            return imageBodyTemplate(`http://192.168.1.5:8000/${data.trademark_sample}`);
         } else {
-            return <span>{value}</span>;
+            return <span>{value as string}</span>;
         }
     };
 
@@ -199,6 +88,27 @@ const SearchRecord = () => {
             </div>
         );
     };
+
+    const fetchTradeMark = useCallback(async (page: number, pageSize: number) => {
+        try {
+            // Make a GET request to the '/api/users' endpoint with the page, pageSize, sortField, and sortOrder as query parameters
+            const response = await axiosInstance.get('/api/trade-mark', { params: { page, pageSize } });
+            const { data: tradeMark, totalTradeMark } = response.data;
+
+            console.log(tradeMark);
+
+            // Update the state with the fetched users and total number of users
+            setData(tradeMark);
+            setTotalData(totalTradeMark);
+        } catch (error) {
+            // Log any errors that occur during the API request
+            console.log(error);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchTradeMark(page, rows);
+    }, [fetchTradeMark, page, rows]);
 
     return (
         <div>

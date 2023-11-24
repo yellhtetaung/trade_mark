@@ -7,6 +7,12 @@ const nextConfig = {
                 hostname: 'www.echolive.ie',
                 port: '',
                 pathname: '/cms_media/module_img/**/**'
+            },
+            {
+                protocol: 'http',
+                hostname: '192.168.1.5',
+                port: '8000',
+                pathname: '/*'
             }
         ]
     }
