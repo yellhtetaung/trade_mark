@@ -44,8 +44,8 @@ const CreateTradeMark = () => {
         submittion_type: {
             Mark: false,
             OldMark: false,
-            ReRegistration: false
-        }
+            ReRegistration: false,
+        },
     });
 
     const resetDefaultState = () => {
@@ -79,8 +79,8 @@ const CreateTradeMark = () => {
             submittion_type: {
                 Mark: false,
                 OldMark: false,
-                ReRegistration: false
-            }
+                ReRegistration: false,
+            },
         });
     };
 
@@ -93,8 +93,8 @@ const CreateTradeMark = () => {
             ...prevState,
             submittion_type: {
                 ...prevState.submittion_type,
-                [e.target.name]: e.target.checked
-            } as SubmittionType
+                [e.target.name]: e.target.checked,
+            } as SubmittionType,
         }));
     };
 
@@ -102,7 +102,7 @@ const CreateTradeMark = () => {
         e.preventDefault();
 
         try {
-            const res = await axiosInstance.post('/api/trade-mark', tradeMark, { headers: { 'Content-Type': 'multipart/form-data' } });
+            await axiosInstance.post('/api/trade-mark', tradeMark, { headers: { 'Content-Type': 'multipart/form-data' } });
 
             resetDefaultState();
         } catch (error) {
@@ -117,124 +117,133 @@ const CreateTradeMark = () => {
                 <div className="p-fluid formgrid grid">
                     <div className="field col-12">
                         <label htmlFor="trademark">Trade Mark</label>
-                        <InputText id="trademark" name="trademark" type="text" value={tradeMark.trademark} onChange={onChangeHandler} />
+                        <InputText id="trademark" name="trademark" type="text" value={tradeMark.trademark} onChange={onChangeHandler} required />
                     </div>
                     <div className="field col-12">
                         <label>Trade Mark Sample</label>
-                        <FileUpload accept="image/*" id="trademark_sample" name="trademark_sample" onSelect={(e) => setTradeMark((prevState) => ({ ...prevState, trademark_sample: e.files[0] }))} />
+                        <FileUpload
+                            accept="image/png"
+                            url="/api/upload"
+                            id="trademark_sample"
+                            name="trademark_sample"
+                            onSelect={(e) => setTradeMark((prevState) => ({ ...prevState, trademark_sample: e.files[0] }))}
+                            maxFileSize={1000000}
+                            withCredentials={true}
+                            onUpload={(e) => console.log(e)}
+                        />
                     </div>
                     <div className="field col-12">
                         <label htmlFor="applicant">Applicant</label>
-                        <InputText value={tradeMark.applicant} id="applicant" name="applicant" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.applicant} id="applicant" name="applicant" onChange={onChangeHandler} required />
                     </div>
                     <div className="field col-12">
                         <label htmlFor="address">Address</label>
-                        <InputTextarea value={tradeMark.address} id="address" name="address" onChange={onChangeHandler} rows={3} autoResize={true} />
+                        <InputTextarea value={tradeMark.address} id="address" name="address" onChange={onChangeHandler} rows={3} autoResize={true} required />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="classes">Classes</label>
-                        <InputText value={tradeMark.classes} id="classes" name="classes" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.classes} id="classes" name="classes" onChange={onChangeHandler} required />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="goods_services">Goods/Services</label>
-                        <InputText value={tradeMark.goods_services} id="goods_services" name="goods_services" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.goods_services} id="goods_services" name="goods_services" onChange={onChangeHandler} required />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="no_ent_reg_cer">Number of Enterprise Registration Certificate</label>
-                        <InputText value={tradeMark.no_ent_reg_cer} id="no_ent_reg_cer" name="no_ent_reg_cer" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.no_ent_reg_cer} id="no_ent_reg_cer" name="no_ent_reg_cer" onChange={onChangeHandler} required />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="nonlatin_char_trans">Non-Latin Characters and Transliteration</label>
-                        <InputText value={tradeMark.nonlatin_char_trans} id="nonlatin_char_trans" name="nonlatin_char_trans" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.nonlatin_char_trans} id="nonlatin_char_trans" name="nonlatin_char_trans" onChange={onChangeHandler} required />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="trans_mean">Translation / Meaning</label>
-                        <InputText value={tradeMark.trans_mean} id="trans_mean" name="trans_mean" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.trans_mean} id="trans_mean" name="trans_mean" onChange={onChangeHandler} required />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="color_claim">Color Claim</label>
-                        <InputText value={tradeMark.color_claim} id="color_claim" name="color_claim" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.color_claim} id="color_claim" name="color_claim" onChange={onChangeHandler} required />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="re_filling_date">Re-filling Date</label>
-                        <Calendar value={tradeMark.re_filling_date} inputId="re_filling_date" name="re_filling_date" dateFormat="mm/dd/yy" showIcon={true} />
+                        <Calendar value={tradeMark.re_filling_date} inputId="re_filling_date" name="re_filling_date" dateFormat="mm/dd/yy" showIcon={true} required />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="re_filling_WIPO_no">Re-filling WIPO No</label>
-                        <InputText value={tradeMark.re_filling_WIPO_no} id="re_filling_WIPO_no" name="re_filling_WIPO_no" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.re_filling_WIPO_no} id="re_filling_WIPO_no" name="re_filling_WIPO_no" onChange={onChangeHandler} required />
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="app_no">App No</label>
-                        <InputText value={tradeMark.app_no} id="app_no" name="app_no" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.app_no} id="app_no" name="app_no" onChange={onChangeHandler} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="off_fill_date">Offical Filling Date</label>
-                        <Calendar value={tradeMark.off_fill_date} inputId="off_fill_date" name="off_fill_date" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar value={tradeMark.off_fill_date} inputId="off_fill_date" name="off_fill_date" dateFormat="dd/mm/yy" showIcon={true} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="payment_WIPO_no">Payment WIPO No</label>
-                        <InputText value={tradeMark.payment_WIPO_no} id="payment_WIPO_no" name="payment_WIPO_no" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.payment_WIPO_no} id="payment_WIPO_no" name="payment_WIPO_no" onChange={onChangeHandler} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="other_procedure">Other Procedure</label>
-                        <InputText value={tradeMark.other_procedure} id="other_procedure" name="other_procedure" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.other_procedure} id="other_procedure" name="other_procedure" onChange={onChangeHandler} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="granting_date">Granting Date</label>
-                        <Calendar value={tradeMark.granting_date} inputId="granting_date" name="granting_date" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar value={tradeMark.granting_date} inputId="granting_date" name="granting_date" dateFormat="mm/dd/yy" showIcon={true} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="reg_no">Reg No</label>
-                        <InputText value={tradeMark.reg_no} id="reg_no" name="reg_no" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.reg_no} id="reg_no" name="reg_no" onChange={onChangeHandler} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="time_renewal">Time Renewal</label>
-                        <InputText value={tradeMark.time_renewal} id="time_renewal" name="time_renewal" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.time_renewal} id="time_renewal" name="time_renewal" onChange={onChangeHandler} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="renewal_date">Renewal Date</label>
-                        <Calendar value={tradeMark.renewal_date} inputId="renewal_date" name="renewal_date" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar value={tradeMark.renewal_date} inputId="renewal_date" name="renewal_date" dateFormat="mm/dd/yy" showIcon={true} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="renewal_no">Renewal Number</label>
-                        <InputText value={tradeMark.renewal_no} id="renewal_no" name="renewal_no" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.renewal_no} id="renewal_no" name="renewal_no" onChange={onChangeHandler} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="val_period">Validity Period</label>
-                        <Calendar value={tradeMark.val_period} inputId="val_period" name="val_period" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar value={tradeMark.val_period} inputId="val_period" name="val_period" dateFormat="mm/dd/yy" showIcon={true} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="date_of_public">Date of publication</label>
-                        <Calendar value={tradeMark.date_of_public} inputId="date_of_public" name="date_of_public" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar value={tradeMark.date_of_public} inputId="date_of_public" name="date_of_public" dateFormat="mm/dd/yy" showIcon={true} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="exp_date">Expiration Date</label>
-                        <Calendar value={tradeMark.exp_date} inputId="exp_date" name="exp_date" dateFormat="mm/dd/yyyy" showIcon={true} />
+                        <Calendar value={tradeMark.exp_date} inputId="exp_date" name="exp_date" dateFormat="mm/dd/yy" showIcon={true} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="reason_exp">Reason Expires</label>
-                        <InputText value={tradeMark.reason_exp} id="reason_exp" name="reason_exp" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.reason_exp} id="reason_exp" name="reason_exp" onChange={onChangeHandler} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="tm2">TM 2</label>
-                        <InputText value={tradeMark.tm2} id="tm2" name="tm2" onChange={onChangeHandler} />
+                        <InputText value={tradeMark.tm2} id="tm2" name="tm2" onChange={onChangeHandler} required />
                     </div>
 
-                    <div className="field col-12">
-                        <div className="flex flex-wrap justify-content-center gap-3">
+                    <div className="field col-12 mt-3">
+                        <div className="flex flex-column md:flex-row gap-3">
                             <div className="flex align-items-center">
                                 <Checkbox inputId="Mark" name="Mark" onChange={onCheckBoxChangeHandler} checked={tradeMark.submittion_type.Mark} />
                                 <label htmlFor="Mark" className="ml-2">

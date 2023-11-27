@@ -6,16 +6,16 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'www.echolive.ie',
                 port: '',
-                pathname: '/cms_media/module_img/**/**'
+                pathname: '/cms_media/module_img/**/**',
             },
             {
                 protocol: 'http',
-                hostname: '192.168.1.5',
+                hostname: '192.168.1.3',
                 port: '8000',
-                pathname: '/*'
-            }
-        ]
-    }
+                pathname: '/*',
+            },
+        ],
+    },
 };
 
 module.exports = nextConfig;
