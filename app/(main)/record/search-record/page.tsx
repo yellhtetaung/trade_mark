@@ -9,20 +9,15 @@ import { DataTable } from 'primereact/datatable';
 import { Column, ColumnBodyOptions } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
-import { Calendar, CalendarChangeEvent } from 'primereact/calendar';
+import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
-import { ChangeHandler, SubmittionType, TradeMark } from '../../../../types/types';
+import { SubmittionType, TradeMark } from '../../../../types/types';
 import { axiosInstance } from '../../../../axiosInstance';
 import { Skeleton } from 'primereact/skeleton';
 import { Tag } from 'primereact/tag';
-
-interface SearchValue {
-    trademark?: string;
-    applicant?: string;
-    created_at?: Date | undefined;
-}
 
 type FilteredValue = 'trademark' | 'applicant' | 'created_at' | 'null';
 
@@ -81,13 +76,19 @@ const SearchRecord = () => {
             ReRegistration: 'Re-Registration',
         };
 
-        return Object.keys(data)
-            .filter(value => data[value as keyof SubmittionType] && submittionTypes[value])
-            .map(value => (
-                <Tag key={value} className="mx-1" severity="info">
-                    {submittionTypes[value]}
-                </Tag>
-            ));
+        const tags: JSX.Element[] = [];
+
+        for (const value in data) {
+            if (data[value as keyof SubmittionType] && submittionTypes[value]) {
+                tags.push(
+                    <Tag key={value} className="mx-1" severity="success">
+                        {submittionTypes[value]}
+                    </Tag>,
+                );
+            }
+        }
+
+        return tags;
     };
 
     const customTemplate = (data: TradeMark, column: ColumnBodyOptions) => {
@@ -156,8 +157,6 @@ const SearchRecord = () => {
         }
     }, []);
 
-    console.log(searchField);
-
     const dataTableHeader: React.FC = () => {
         const dropdownOptions = [
             { name: 'Select Field', code: 'null' },
@@ -199,6 +198,7 @@ const SearchRecord = () => {
                     <InputText
                         id="search"
                         name="search"
+                        value={searchField as string}
                         onChange={e => {
                             if (e.target.value === '') {
                                 setPage(0);
@@ -208,7 +208,6 @@ const SearchRecord = () => {
                             e.target.value !== '' && setPage(0);
                             setSearchField(e.target.value);
                         }}
-                        type="search"
                         placeholder="Search..."
                     />
                 )}
@@ -218,6 +217,7 @@ const SearchRecord = () => {
                     icon="pi pi-filter-slash"
                     severity="danger"
                     onClick={() => {
+                        console.log(searchField);
                         if (filteredValue !== 'null' || searchField !== '') {
                             setFilteredValue('null');
                             setPage(0);
@@ -230,7 +230,7 @@ const SearchRecord = () => {
         );
     };
 
-    const fetchTradeMark = useCallback(async (page: number, pageSize: number) => {
+    const fetchTradeMark = async (page: number, pageSize: number) => {
         setIsLoading(true);
         try {
             const response = await axiosInstance.get('/api/trade-mark', { params: { page, pageSize } });
@@ -251,19 +251,38 @@ const SearchRecord = () => {
             setTotalData(totalTradeMark);
             setIsLoading(false);
         } catch (error) {
+            if (page > 0) {
+                setPage(page - 1);
+            }
+            setData(undefined);
+            setIsLoading(false);
             console.log(error);
         }
-    }, []);
+    };
+
+    const deleteHandler = async (id: number) => {
+        try {
+            const res = await axiosInstance.delete(`/api/trade-mark/${id}`);
+            const data = res.data;
+
+            if (res.status === 200) {
+                toastRef.current.show({ severity: 'success', summary: 'Delete', detail: data.message, life: 3000 });
+                fetchTradeMark(page, rows);
+            }
+        } catch (error: any) {
+            toastRef.current.show({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 3000 });
+        }
+    };
 
     useLayoutEffect(() => {
         // Memoize the fetchUsers and onFilterHandler functions
 
         if (searchField === '' && filteredValue === 'null') {
-            fetchTradeMark(page, rows).catch(error => console.log(error));
+            fetchTradeMark(page, rows);
         }
 
         // Call the memoized function
-    }, [fetchTradeMark, page, rows, searchField, filteredValue]);
+    }, [page, rows, searchField, filteredValue]);
 
     useEffect(() => {
         router.prefetch('/trade-mark/create-trade-mark/[slug]');
@@ -272,6 +291,7 @@ const SearchRecord = () => {
     return (
         <div>
             <Toast ref={toastRef} />
+            <ConfirmDialog />
             <h1 className="text-4xl font-bold">Search Record</h1>
 
             <div className="card">
@@ -283,7 +303,7 @@ const SearchRecord = () => {
                     rowsPerPageOptions={[10, 30, 50, 100]}
                     lazy={true}
                     paginator={true}
-                    tableStyle={{ minWidth: '400rem' }}
+                    tableStyle={{ minWidth: '350rem' }}
                     header={dataTableHeader}
                     showGridlines={true}
                     onPage={e => {
@@ -291,12 +311,28 @@ const SearchRecord = () => {
                         setRows(e.rows);
                         setPage(e.page as number);
                     }}
-                    editMode="row"
-                    sortMode="multiple"
-                    removableSort
-                    onRowEditChange={e => router.push(`/trade-mark/create-trade-mark/${e.data[0].id}`)}
                 >
-                    <Column rowEditor />
+                    <Column rowEditor body={options => <Button icon="pi pi-fw pi-pencil" severity="warning" rounded text onClick={() => router.push(`/trade-mark/create-trade-mark/${options.id}`)} />} />
+                    <Column
+                        body={options => (
+                            <Button
+                                icon="pi pi-fw pi-trash"
+                                severity="danger"
+                                rounded
+                                text
+                                onClick={() => {
+                                    confirmDialog({
+                                        message: 'Are you sure you want to delete this record?',
+                                        header: 'Delete Confirmation',
+                                        icon: 'pi pi-info-circle',
+                                        accept: () => deleteHandler(options.id),
+                                        acceptClassName: 'p-button-danger',
+                                        reject: () => {},
+                                    });
+                                }}
+                            />
+                        )}
+                    />
                     <Column field="id" header="ID" alignHeader="center" align="center" body={(_, context) => (!isLoading ? context.rowIndex + 1 : <Skeleton />)} />
                     {column.map((col, index) => (
                         <Column alignHeader="center" align="center" field={col.field} key={index} header={col.header} body={(rowData, column) => (!isLoading ? customTemplate(rowData, column) : <Skeleton />)} />

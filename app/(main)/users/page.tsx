@@ -8,6 +8,7 @@ import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
 import { Skeleton } from 'primereact/skeleton';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 import { axiosInstance } from '../../../axiosInstance';
 import { InputText } from 'primereact/inputtext';
@@ -186,7 +187,7 @@ const Users = () => {
         );
     };
 
-    const fetchUsers = useCallback(async (page: number, pageSize: number, sortField: string, sortOrder: 1 | -1) => {
+    const fetchUsers = async (page: number, pageSize: number, sortField: string, sortOrder: 1 | -1) => {
         setIsLoading(true);
         try {
             // Make a GET request to the '/api/users' endpoint with the page, pageSize, sortField, and sortOrder as query parameters
@@ -205,10 +206,29 @@ const Users = () => {
             setTotalRecord(totalUsers);
             setIsLoading(false);
         } catch (error) {
+            if (page > 0) {
+                setPage(page - 1);
+            }
+            setUsers(undefined);
+            setIsLoading(false);
             // Log any errors that occur during the API request
             console.log(error);
         }
-    }, []);
+    };
+
+    const deleteHandler = async (id: number) => {
+        try {
+            const response = await axiosInstance.delete(`/api/users/${id}`);
+            const data = response.data;
+
+            if (response.status === 200) {
+                toastRef.current.show({ severity: 'success', summary: 'Delete', detail: data.message, life: 3000 });
+                fetchUsers(page, rows, sortField, sortOrder);
+            }
+        } catch (error: any) {
+            toastRef.current.show({ severity: 'error', summary: 'Error', detail: error.response.message, life: 3000 });
+        }
+    };
 
     useLayoutEffect(() => {
         // Memoize the fetchUsers and onFilterHandler functions
@@ -218,11 +238,14 @@ const Users = () => {
         }
 
         // Call the memoized function
-    }, [fetchUsers, page, rows, sortField, sortOrder, searchField, filteredValue]);
+    }, [page, rows, sortField, sortOrder, searchField, filteredValue]);
+
+    console.log(page);
 
     return (
         <div>
             <Toast ref={toastRef} />
+            <ConfirmDialog />
             <h1 className="text-4xl font-bold">User Lists</h1>
 
             <div className="card">
@@ -262,7 +285,32 @@ const Users = () => {
                     <Column field="nrc" header="NRC" editor={options => inputEditor(options)} body={option => (!isLoading ? <span>{option.nrc}</span> : <Skeleton />)} />
                     <Column field="address" header="Address" editor={options => inputEditor(options)} body={option => (!isLoading ? <span>{option.address}</span> : <Skeleton />)} />
                     <Column field="active" header="Active" body={option => (!isLoading ? activeBodyTemplate(option) : <Skeleton />)} editor={dropDownEditor} />
-                    <Column rowEditor />
+                    <Column rowEditor align="center" body={isLoading && <Skeleton />} />
+                    <Column
+                        align="center"
+                        body={(option, content) =>
+                            !isLoading ? (
+                                <Button
+                                    icon="pi pi-trash"
+                                    text
+                                    severity="danger"
+                                    rounded
+                                    onClick={() => {
+                                        confirmDialog({
+                                            message: 'Are you sure you want to delete this user?',
+                                            header: 'Confirmation',
+                                            icon: 'pi  pi-exclamation-triangle',
+                                            acceptClassName: 'p-button-danger',
+                                            accept: () => deleteHandler(option.id),
+                                            reject: () => {},
+                                        });
+                                    }}
+                                />
+                            ) : (
+                                <Skeleton />
+                            )
+                        }
+                    />
                 </DataTable>
             </div>
         </div>

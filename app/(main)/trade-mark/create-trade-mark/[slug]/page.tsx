@@ -152,8 +152,6 @@ const CreateTradeMark = () => {
         fetchTradeMark();
     }, [fetchTradeMark]);
 
-    console.log(tradeMark.trademark_sample);
-
     return (
         <div>
             <h1 className="text-4xl font-bold">Create Trade Mark</h1>
@@ -179,7 +177,9 @@ const CreateTradeMark = () => {
                             }
                             maxFileSize={1000000}
                             withCredentials={true}
-                            onUpload={e => console.log(e)}
+                            uploadOptions={{
+                                style: { display: 'none' },
+                            }}
                         />
                     </div>
                     <div className="field col-12">
@@ -316,7 +316,8 @@ const CreateTradeMark = () => {
                     </div>
                 </div>
 
-                <div className="flex justify-content-end">
+                <div className="flex justify-content-end gap-4">
+                    <Button label="Cancel" severity="danger" type="button" onClick={() => router.back()} />
                     <Button label="Update" type="submit" />
                 </div>
             </form>

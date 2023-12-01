@@ -8,12 +8,14 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Calendar, CalendarChangeEvent } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox';
+import { Toast } from 'primereact/toast';
 
 import { ChangeHandler, TradeMark, SubmittionType } from '../../../../types/types';
 
 import { axiosInstance } from '../../../../axiosInstance';
 
 const CreateTradeMark = () => {
+    const toastRef = useRef<any | null>(null);
     const fileUploadRef = useRef<FileUpload>(null);
     const [tradeMark, setTradeMark] = useState<TradeMark>({
         trademark: '',
@@ -107,6 +109,7 @@ const CreateTradeMark = () => {
             await axiosInstance.post('/api/trade-mark', tradeMark, { headers: { 'Content-Type': 'multipart/form-data' } });
 
             resetDefaultState();
+            toastRef.current.show({ severity: 'success', summary: 'Success', detail: 'Trade Mark Created', life: 3000 });
         } catch (error) {
             console.log(error);
         }
@@ -114,6 +117,7 @@ const CreateTradeMark = () => {
 
     return (
         <div>
+            <Toast ref={toastRef} />
             <h1 className="text-4xl font-bold">Create Trade Mark</h1>
             <form encType="multipart/form-data" className="card" onSubmit={submitHandler}>
                 <div className="p-fluid formgrid grid">
@@ -138,6 +142,9 @@ const CreateTradeMark = () => {
                             maxFileSize={1000000}
                             withCredentials={true}
                             onUpload={e => console.log(e)}
+                            uploadOptions={{
+                                style: { display: 'none' },
+                            }}
                         />
                     </div>
                     <div className="field col-12">
