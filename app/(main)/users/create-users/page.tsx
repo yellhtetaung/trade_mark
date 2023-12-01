@@ -7,7 +7,6 @@ import { Password } from 'primereact/password';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import { Dropdown } from 'primereact/dropdown';
 
 import { User, ChangeHandler } from '../../../../types/types';
 
@@ -21,7 +20,7 @@ const CreateUsers = () => {
         password: '',
         phoneNumber: '',
         nrc: '',
-        address: ''
+        address: '',
     });
 
     const defaultState = useCallback(() => {
@@ -31,12 +30,12 @@ const CreateUsers = () => {
             password: '',
             phoneNumber: '',
             nrc: '',
-            address: ''
+            address: '',
         });
     }, []);
 
     const onChangeHandler = useCallback((e: ChangeHandler) => {
-        setUser((prevState) => ({ ...prevState, [e.target.name]: e.target.value }));
+        setUser(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
     }, []);
 
     const submitHandler = useCallback(
@@ -55,7 +54,7 @@ const CreateUsers = () => {
                 toastRef.current.show({ severity: 'error', summary: 'Error', detail: errorMessage, life: 3000 });
             }
         },
-        [user, defaultState]
+        [user, defaultState],
     );
 
     return (
