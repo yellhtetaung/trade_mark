@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+
+import { useParams, useRouter } from 'next/navigation';
 
 import { InputText } from 'primereact/inputtext';
 import { FileUpload } from 'primereact/fileupload';
@@ -9,11 +11,13 @@ import { Calendar, CalendarChangeEvent } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox';
 
-import { ChangeHandler, TradeMark, SubmittionType } from '../../../../types/types';
+import { ChangeHandler, TradeMark, SubmittionType } from '../../../../../types/types';
 
-import { axiosInstance } from '../../../../axiosInstance';
+import { axiosInstance } from '../../../../../axiosInstance';
 
 const CreateTradeMark = () => {
+    const router = useRouter();
+    const { slug } = useParams();
     const fileUploadRef = useRef<FileUpload>(null);
     const [tradeMark, setTradeMark] = useState<TradeMark>({
         trademark: '',
@@ -104,13 +108,51 @@ const CreateTradeMark = () => {
         e.preventDefault();
 
         try {
-            await axiosInstance.post('/api/trade-mark', tradeMark, { headers: { 'Content-Type': 'multipart/form-data' } });
+            const res = await axiosInstance.put(`/api/trade-mark/${slug}`, tradeMark, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-            resetDefaultState();
+            if (res.status === 201) {
+                resetDefaultState();
+                router.push('/record/search-record');
+            }
         } catch (error) {
             console.log(error);
         }
     };
+
+    const fetchTradeMark = useCallback(async () => {
+        try {
+            const response = await axiosInstance.get(`/api/trade-mark/search?id=${slug}`);
+            const { re_filling_date, off_fill_date, granting_date, renewal_date, val_period, date_of_public, exp_date, trademark_sample, ...data } = response.data as TradeMark;
+
+            const fileType = typeof trademark_sample === 'string' && trademark_sample.split('.')[1];
+            const imageFile = trademark_sample && new File([trademark_sample], `${trademark_sample}`, { type: `image/${fileType}` });
+            const objectURL = trademark_sample && `http://192.168.100.29:8000/${trademark_sample}`;
+
+            const file = imageFile && objectURL && ({ name: imageFile.name, type: imageFile.type, size: imageFile.size, lastModified: imageFile.lastModified, webkitRelativePath: imageFile.webkitRelativePath, objectURL } as unknown as File);
+
+            fileUploadRef.current?.setFiles(file ? [file] : []);
+
+            setTradeMark({
+                ...data,
+                trademark_sample: trademark_sample,
+                re_filling_date: re_filling_date && new Date(re_filling_date),
+                off_fill_date: off_fill_date && new Date(off_fill_date),
+                granting_date: granting_date && new Date(granting_date),
+                renewal_date: renewal_date && new Date(renewal_date),
+                val_period: val_period && new Date(val_period),
+                date_of_public: date_of_public && new Date(date_of_public),
+                exp_date: exp_date && new Date(exp_date),
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }, [slug]);
+
+    useEffect(() => {
+        fetchTradeMark();
+    }, [fetchTradeMark]);
+
+    console.log(tradeMark.trademark_sample);
 
     return (
         <div>
@@ -187,7 +229,7 @@ const CreateTradeMark = () => {
 
                     <div className="field col-12 md:col-6">
                         <label htmlFor="off_fill_date">Offical Filling Date</label>
-                        <Calendar value={tradeMark.off_fill_date} inputId="off_fill_date" name="off_fill_date" dateFormat="mm/dd/yy" showIcon={true} required onChange={onChangeHandler} />
+                        <Calendar value={tradeMark.off_fill_date} inputId="off_fill_date" name="off_fill_date" dateFormat="mm/dd/yy" onChange={onChangeHandler} showIcon={true} required />
                     </div>
 
                     <div className="field col-12 md:col-6">
@@ -275,7 +317,7 @@ const CreateTradeMark = () => {
                 </div>
 
                 <div className="flex justify-content-end">
-                    <Button label="Submit" type="submit" />
+                    <Button label="Update" type="submit" />
                 </div>
             </form>
         </div>
