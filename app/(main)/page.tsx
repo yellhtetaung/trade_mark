@@ -209,7 +209,7 @@ export default function SearchImage() {
 
             {recognition?.length > 0 && (
                 <div className="mt-5 card">
-                    <DataView value={recognition.toSorted((a, b) => a.distance - b.distance)} layout="grid" itemTemplate={options => imageListTemplate(options)} />
+                    <DataView value={recognition.sort((a, b) => a.distance - b.distance)} layout="grid" itemTemplate={options => imageListTemplate(options)} />
                 </div>
             )}
         </div>
