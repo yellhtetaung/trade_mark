@@ -17,6 +17,7 @@ import { axiosInstance } from '../../../../axiosInstance';
 const CreateTradeMark = () => {
     const toastRef = useRef<any | null>(null);
     const fileUploadRef = useRef<FileUpload>(null);
+    const attachmentRef = useRef<FileUpload>(null);
     const [tradeMark, setTradeMark] = useState<TradeMark>({
         trademark: '',
         trademark_sample: undefined,
@@ -49,6 +50,7 @@ const CreateTradeMark = () => {
             OldMark: false,
             ReRegistration: false,
         },
+        attachment: undefined,
     });
 
     const resetDefaultState = () => {
@@ -84,8 +86,10 @@ const CreateTradeMark = () => {
                 OldMark: false,
                 ReRegistration: false,
             },
+            attachment: undefined,
         });
         fileUploadRef.current?.clear();
+        attachmentRef.current?.clear();
     };
 
     const onChangeHandler = (e: ChangeHandler | CalendarChangeEvent) => {
@@ -106,7 +110,7 @@ const CreateTradeMark = () => {
         e.preventDefault();
 
         try {
-            await axiosInstance.post('/api/trade-mark', tradeMark, { headers: { 'Content-Type': 'multipart/form-data' } });
+            await axiosInstance.post('/api/trade-mark', { ...tradeMark, attachment: tradeMark.attachment !== undefined ? tradeMark.attachment : null }, { headers: { 'Content-Type': 'multipart/form-data' } });
 
             resetDefaultState();
             toastRef.current.show({ severity: 'success', summary: 'Success', detail: 'Trade Mark Created', life: 3000 });
@@ -139,9 +143,13 @@ const CreateTradeMark = () => {
                                     trademark_sample: e.files[0],
                                 }))
                             }
-                            maxFileSize={1000000}
+                            onClear={() =>
+                                setTradeMark(prevState => ({
+                                    ...prevState,
+                                    trademark_sample: undefined,
+                                }))
+                            }
                             withCredentials={true}
-                            onUpload={e => console.log(e)}
                             uploadOptions={{
                                 style: { display: 'none' },
                             }}
@@ -278,6 +286,26 @@ const CreateTradeMark = () => {
                                 </label>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="field col-12 mt-3">
+                        <label htmlFor="attachment">Attachment</label>
+                        <FileUpload
+                            ref={attachmentRef}
+                            id="attachment"
+                            name="attachment"
+                            url="/api/upload"
+                            accept="application/pdf"
+                            uploadOptions={{ style: { display: 'none' } }}
+                            onSelect={e =>
+                                setTradeMark(prevState => ({
+                                    ...prevState,
+                                    attachment: e.files[0],
+                                }))
+                            }
+                            onClear={() => setTradeMark(prevState => ({ ...prevState, attachment: undefined }))}
+                            withCredentials={true}
+                        />
                     </div>
                 </div>
 

@@ -17,11 +17,22 @@ import { Button } from 'primereact/button';
 
 type FilteredValue = 'username' | 'email' | 'null';
 
+interface FetchedUser {
+    id: string;
+    username: string;
+    email: string;
+    phone_no: string;
+    nrc: string;
+    address: string;
+    active: boolean;
+}
+
 const Users = () => {
     const [users, setUsers] = useState<User[] | undefined>();
     const [totalRecord, setTotalRecord] = useState<number>(0);
     const toastRef = useRef<any | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const datatableRef = useRef<DataTable<any>>(null);
 
     const [rows, setRows] = useState<number>(10);
     const [first, setFirst] = useState<number>(0);
@@ -53,11 +64,23 @@ const Users = () => {
             { name: 'Inactive', value: false },
         ];
 
+        const role = [
+            { name: 'Admin', value: 'Admin' },
+            { name: 'User', value: 'User' },
+        ];
+
+        if (options.field === 'role') {
+            // Return the dropdown editor component
+            return <Dropdown value={options.value} onChange={(e: any) => options.editorCallback?.(e.value)} options={role} optionLabel="name" />;
+        }
+
         // Template function to render each dropdown item
-        const itemTemplate = ({ active, value }: any) => <Tag value={active || value ? 'Active' : 'Inactive'} severity={active || value ? 'success' : 'danger'} />;
+        const activeTemplate = ({ active, value }: any) => {
+            return <Tag value={active || value ? 'Active' : 'Inactive'} severity={active || value ? 'success' : 'danger'} />;
+        };
 
         // Return the dropdown editor component
-        return <Dropdown value={options.value} onChange={(e: any) => options.editorCallback?.(e.value)} options={active} optionLabel="name" itemTemplate={itemTemplate} valueTemplate={itemTemplate} />;
+        return <Dropdown value={options.value} onChange={(e: any) => options.editorCallback?.(e.value)} options={active} optionLabel="name" itemTemplate={activeTemplate} valueTemplate={activeTemplate} />;
     };
 
     const onEditHandler = useCallback(
@@ -134,6 +157,54 @@ const Users = () => {
         }
     }, []);
 
+    const exportCSV = (selectionOnly: boolean) => {
+        datatableRef.current?.exportCSV({ selectionOnly });
+    };
+
+    const exportExcel = () => {
+        import('xlsx').then(async xlsx => {
+            try {
+                const response = await axiosInstance.get('/api/users');
+                const { data: users } = response.data;
+
+                const newUsers = users.map((user: FetchedUser, index: number) => ({
+                    id: index + 1,
+                    username: user?.username,
+                    email: user?.email,
+                    phone_no: user?.phone_no,
+                    nrc: user?.nrc,
+                    address: user?.address,
+                    active: user?.active,
+                }));
+
+                const worksheet = xlsx.utils.json_to_sheet(newUsers);
+                const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+                const excelBuffer = xlsx.write(workbook, {
+                    bookType: 'xlsx',
+                    type: 'array',
+                });
+
+                saveAsExcelFile(excelBuffer, 'users');
+            } catch (error) {
+                console.log(error);
+            }
+        });
+    };
+
+    const saveAsExcelFile = (buffer: any, fileName: string) => {
+        import('file-saver').then(module => {
+            if (module && module.default) {
+                let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+                let EXCEL_EXTENSION = '.xlsx';
+                const data = new Blob([buffer], {
+                    type: EXCEL_TYPE,
+                });
+
+                module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+            }
+        });
+    };
+
     const dataTableHeader: React.FC = () => {
         const dropdownOptions = [
             { name: 'Select Field', code: 'null' },
@@ -151,6 +222,7 @@ const Users = () => {
                     optionLabel="name"
                     onChange={e => {
                         setFilteredValue(e.value.code);
+                        setSearchField('');
                     }}
                 />
                 <InputText
@@ -183,6 +255,14 @@ const Users = () => {
                         }
                     }}
                 />
+
+                <div className="ml-auto">
+                    <div className="flex align-items-center justify-content-end gap-2">
+                        <Button type="button" icon="pi pi-file" rounded onClick={() => exportCSV(false)} data-pr-tooltip="CSV" />
+                        <Button type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" />
+                        {/* <Button type="button" icon="pi pi-file-pdf" severity="warning" rounded onClick={exportPdf} data-pr-tooltip="PDF" /> */}
+                    </div>
+                </div>
             </div>
         );
     };
@@ -240,8 +320,6 @@ const Users = () => {
         // Call the memoized function
     }, [page, rows, sortField, sortOrder, searchField, filteredValue]);
 
-    console.log(page);
-
     return (
         <div>
             <Toast ref={toastRef} />
@@ -250,6 +328,7 @@ const Users = () => {
 
             <div className="card">
                 <DataTable
+                    ref={datatableRef}
                     value={users}
                     editMode="row"
                     onRowEditComplete={onEditHandler}
@@ -279,12 +358,20 @@ const Users = () => {
                     removableSort
                 >
                     <Column field="created_at" header="No" body={(_, context) => (!isLoading ? context.rowIndex + 1 : <Skeleton />)} sortable />
+
                     <Column field="username" header="Name" editor={options => inputEditor(options)} body={option => (!isLoading ? <span>{option.username}</span> : <Skeleton />)} sortable />
+
                     <Column field="email" header="Email" editor={options => inputEditor(options)} body={option => (!isLoading ? <span>{option.email}</span> : <Skeleton />)} />
+
                     <Column field="phone_no" header="Phone Number" editor={options => inputEditor(options)} body={option => (!isLoading ? <span>{option.phone_no}</span> : <Skeleton />)} />
+
                     <Column field="nrc" header="NRC" editor={options => inputEditor(options)} body={option => (!isLoading ? <span>{option.nrc}</span> : <Skeleton />)} />
+
                     <Column field="address" header="Address" editor={options => inputEditor(options)} body={option => (!isLoading ? <span>{option.address}</span> : <Skeleton />)} />
+
                     <Column field="active" header="Active" body={option => (!isLoading ? activeBodyTemplate(option) : <Skeleton />)} editor={dropDownEditor} />
+
+                    <Column field="role" header="role" editor={dropDownEditor} body={option => (!isLoading ? <span>{option.role}</span> : <Skeleton />)} />
                     <Column rowEditor align="center" body={isLoading && <Skeleton />} />
                     <Column
                         align="center"

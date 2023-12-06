@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
         const data = response.data;
 
         if (response.status === 200) {
-            const nextResponse = NextResponse.json({ message: data.message }, { status: 200 });
+            const nextResponse = NextResponse.json({ message: data.message, token: data.token }, { status: 200 });
             nextResponse.cookies.set({ name: 'token', value: data.token, httpOnly: true, sameSite: 'strict', expires: new Date(Date.now() + 60 * 60 * 24 * 1000) });
 
             return nextResponse;

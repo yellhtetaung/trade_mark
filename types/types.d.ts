@@ -21,7 +21,7 @@ import {
     AppTopbarRef,
     MenuModelItem,
     AppMenuItemProps,
-    AppMenuItem
+    AppMenuItem,
 } from './layout';
 import { Demo, LayoutType, SortOrderType, CustomEvent, ChartDataState, ChartOptionsState, AppMailSidebarItem, AppMailReplyProps, AppMailProps } from './demo';
 
@@ -58,7 +58,7 @@ export type {
     AppMailSidebarItem,
     AppMailReplyProps,
     AppMailProps,
-    AppMenuItem
+    AppMenuItem,
 };
 
 export interface User {
@@ -70,6 +70,7 @@ export interface User {
     nrc: string;
     address: string;
     active?: boolean;
+    role?: string;
 }
 
 export type SubmittionType = {
@@ -107,6 +108,8 @@ export interface TradeMark {
     reason_exp: string | undefined;
     tm2: string | undefined;
     submittion_type: SubmittionType;
+    created_at?: Date | undefined;
+    attachment: File | string | undefined;
 }
 
 export type ChangeHandler = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;

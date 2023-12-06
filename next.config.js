@@ -12,7 +12,7 @@ const nextConfig = {
                 protocol: 'http',
                 hostname: '192.168.100.29',
                 port: '8000',
-                pathname: '/*',
+                pathname: '/trademark_sample/*',
             },
         ],
     },
