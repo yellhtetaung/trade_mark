@@ -15,10 +15,11 @@ import { ChangeHandler, TradeMark, SubmittionType } from '../../../../../types/t
 
 import { axiosInstance } from '../../../../../axiosInstance';
 
-const CreateTradeMark = () => {
+const UpdateTradeMark = () => {
     const router = useRouter();
     const { slug } = useParams();
     const fileUploadRef = useRef<FileUpload>(null);
+    const attachmentRef = useRef<FileUpload>(null);
     const [tradeMark, setTradeMark] = useState<TradeMark>({
         trademark: '',
         trademark_sample: undefined,
@@ -51,6 +52,7 @@ const CreateTradeMark = () => {
             OldMark: false,
             ReRegistration: false,
         },
+        attachment: undefined,
     });
 
     const resetDefaultState = () => {
@@ -86,6 +88,7 @@ const CreateTradeMark = () => {
                 OldMark: false,
                 ReRegistration: false,
             },
+            attachment: undefined,
         });
         fileUploadRef.current?.clear();
     };
@@ -112,7 +115,7 @@ const CreateTradeMark = () => {
 
             if (res.status === 201) {
                 resetDefaultState();
-                router.push('/record/search-record');
+                router.push('/trade-mark');
             }
         } catch (error) {
             console.log(error);
@@ -122,19 +125,24 @@ const CreateTradeMark = () => {
     const fetchTradeMark = useCallback(async () => {
         try {
             const response = await axiosInstance.get(`/api/trade-mark/search?id=${slug}`);
-            const { re_filling_date, off_fill_date, granting_date, renewal_date, val_period, date_of_public, exp_date, trademark_sample, ...data } = response.data as TradeMark;
+            const { re_filling_date, off_fill_date, granting_date, renewal_date, val_period, date_of_public, exp_date, trademark_sample, attachment, ...data } = response.data as TradeMark;
 
             const fileType = typeof trademark_sample === 'string' && trademark_sample.split('.')[1];
             const imageFile = trademark_sample && new File([trademark_sample], `${trademark_sample}`, { type: `image/${fileType}` });
-            const objectURL = trademark_sample && `http://192.168.100.29:8000/${trademark_sample}`;
+            const objectURL = trademark_sample && `http://192.168.100.29:8000/trademark_sample/${trademark_sample}`;
 
             const file = imageFile && objectURL && ({ name: imageFile.name, type: imageFile.type, size: imageFile.size, lastModified: imageFile.lastModified, webkitRelativePath: imageFile.webkitRelativePath, objectURL } as unknown as File);
 
             fileUploadRef.current?.setFiles(file ? [file] : []);
 
+            const attachmentFile = attachment && new File([attachment], `${attachment}`);
+
+            attachmentRef.current?.setFiles(attachmentFile ? [attachmentFile] : []);
+
             setTradeMark({
                 ...data,
                 trademark_sample: trademark_sample,
+                attachment: attachment,
                 re_filling_date: re_filling_date && new Date(re_filling_date),
                 off_fill_date: off_fill_date && new Date(off_fill_date),
                 granting_date: granting_date && new Date(granting_date),
@@ -152,11 +160,12 @@ const CreateTradeMark = () => {
         fetchTradeMark();
     }, [fetchTradeMark]);
 
-    console.log(tradeMark.trademark_sample);
-
     return (
         <div>
-            <h1 className="text-4xl font-bold">Create Trade Mark</h1>
+            <div className="w-full flex align-items-center gap-3 mb-4">
+                <Button icon="pi pi-fw pi-arrow-left" rounded size="small" onClick={() => router.back()} />
+                <span className="text-4xl font-bold">Update Trade Mark</span>
+            </div>
             <form encType="multipart/form-data" className="card" onSubmit={submitHandler}>
                 <div className="p-fluid formgrid grid">
                     <div className="field col-12">
@@ -179,7 +188,9 @@ const CreateTradeMark = () => {
                             }
                             maxFileSize={1000000}
                             withCredentials={true}
-                            onUpload={e => console.log(e)}
+                            uploadOptions={{
+                                style: { display: 'none' },
+                            }}
                         />
                     </div>
                     <div className="field col-12">
@@ -314,9 +325,23 @@ const CreateTradeMark = () => {
                             </div>
                         </div>
                     </div>
+
+                    <div className="field col-12 my-4">
+                        <label htmlFor="attachment">Attachment</label>
+                        <FileUpload
+                            id="attachment"
+                            name="attachment"
+                            ref={attachmentRef}
+                            url="/api/upload"
+                            accept="application/pdf"
+                            onSelect={e => setTradeMark(prevState => ({ ...prevState, attachment: e.files[0] }))}
+                            uploadOptions={{ style: { display: 'none' } }}
+                        />
+                    </div>
                 </div>
 
-                <div className="flex justify-content-end">
+                <div className="flex justify-content-end gap-4">
+                    <Button label="Cancel" severity="danger" type="button" onClick={() => router.back()} />
                     <Button label="Update" type="submit" />
                 </div>
             </form>
@@ -324,4 +349,4 @@ const CreateTradeMark = () => {
     );
 };
 
-export default CreateTradeMark;
+export default UpdateTradeMark;

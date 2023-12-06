@@ -12,7 +12,11 @@ import { classNames } from 'primereact/utils';
 import axios from 'axios';
 
 const LoginPage = () => {
+    const [email, setEmail] = useState('');
+    const [isEmailError, setIsEmailError] = useState(false);
+    const [isActiveError, setIsActiveError] = useState(false);
     const [password, setPassword] = useState('');
+    const [isPasswordError, setIsPasswordError] = useState(false);
     const [checked, setChecked] = useState(false);
     const { layoutConfig } = useContext(LayoutContext);
 
@@ -20,9 +24,32 @@ const LoginPage = () => {
     const containerClassName = classNames('surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden', { 'p-input-filled': layoutConfig.inputStyle === 'filled' });
 
     const signIn = async () => {
-        const res = await axios.post('/api/login', { withCredentials: true });
-        if (res.data.success) {
-            router.push('/');
+        setIsEmailError(false);
+        setIsPasswordError(false);
+        setIsActiveError(false);
+        try {
+            const res = await axios.post('/api/login', { email, password }, { withCredentials: true });
+
+            if (res.status === 200) {
+                window.sessionStorage.setItem('token', JSON.stringify(res.data.token));
+                router.replace('/');
+            }
+        } catch (error: any) {
+            const errorMessage: string = error.response.data.error;
+
+            if (errorMessage === 'This email does not registered') {
+                setIsEmailError(true);
+            }
+
+            if (errorMessage === 'Incorrect password') {
+                setIsPasswordError(true);
+            }
+
+            if (errorMessage === 'This user is inactive') {
+                setIsActiveError(true);
+            }
+
+            console.log(error);
         }
     };
 
@@ -38,19 +65,44 @@ const LoginPage = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
-                                Email
-                            </label>
-                            <InputText id="email1" type="text" placeholder="Email address" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} />
+                            <div className="flex flex-column mb-5">
+                                <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
+                                    Email
+                                </label>
+                                <InputText
+                                    id="email1"
+                                    value={email}
+                                    type="email"
+                                    placeholder="Email address"
+                                    className={`w-full md:w-30rem ${isEmailError && 'p-invalid'}`}
+                                    style={{ padding: '1rem' }}
+                                    onChange={e => setEmail(e.target.value)}
+                                    aria-describedby="email-help"
+                                />
+                                {isEmailError && <small className="email-help text-red-500">This email does not registered.</small>}
+                                {isActiveError && <small className="email-help text-red-500">This email is inactive.</small>}
+                            </div>
 
-                            <label htmlFor="password1" className="block text-900 font-medium text-xl mb-2">
-                                Password
-                            </label>
-                            <Password inputId="password1" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem"></Password>
+                            <div className="flex flex-column mb-5">
+                                <label htmlFor="password1" className="block text-900 font-medium text-xl mb-2">
+                                    Password
+                                </label>
+                                <Password
+                                    inputId="password1"
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    placeholder="Password"
+                                    toggleMask
+                                    className={`w-full ${isPasswordError && 'p-invalid'}`}
+                                    inputClassName="w-full p-3 md:w-30rem"
+                                    aria-describedby="password-help"
+                                ></Password>
+                                {isPasswordError && <small className="password-help text-red-500">Incorrect password.</small>}
+                            </div>
 
                             <div className="flex align-items-center justify-content-between mb-5 gap-5">
                                 <div className="flex align-items-center">
-                                    <Checkbox inputId="rememberme1" checked={checked} onChange={(e) => setChecked(e.checked ?? false)} className="mr-2"></Checkbox>
+                                    <Checkbox inputId="rememberme1" checked={checked} onChange={e => setChecked(e.checked ?? false)} className="mr-2"></Checkbox>
                                     <label htmlFor="rememberme1">Remember me</label>
                                 </div>
                                 <a className="font-medium no-underline ml-2 text-right cursor-pointer" style={{ color: 'var(--primary-color)' }}>

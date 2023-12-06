@@ -11,9 +11,15 @@ import { Toast } from 'primereact/toast';
 import { User, ChangeHandler } from '../../../../types/types';
 
 import { axiosInstance } from '../../../../axiosInstance';
+import { Dropdown } from 'primereact/dropdown';
 
 const CreateUsers = () => {
     const toastRef = useRef<any | null>(null);
+    const [role, setRole] = useState([
+        { name: 'User', code: 'User' },
+        { name: 'Admin', code: 'Admin' },
+    ]);
+
     const [user, setUser] = useState<User>({
         username: '',
         email: '',
@@ -21,9 +27,12 @@ const CreateUsers = () => {
         phoneNumber: '',
         nrc: '',
         address: '',
+        role: role[0].code,
     });
 
-    const defaultState = useCallback(() => {
+    const roleValue = role.find(item => item.code === user.role);
+
+    const defaultState = () => {
         setUser({
             username: '',
             email: '',
@@ -31,31 +40,29 @@ const CreateUsers = () => {
             phoneNumber: '',
             nrc: '',
             address: '',
+            role: role[0].code,
         });
-    }, []);
+    };
 
     const onChangeHandler = useCallback((e: ChangeHandler) => {
         setUser(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
     }, []);
 
-    const submitHandler = useCallback(
-        async (e: React.FormEvent) => {
-            e.preventDefault();
+    const submitHandler = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-            try {
-                const res = await axiosInstance.post('/api/users', user);
+        try {
+            const res = await axiosInstance.post('/api/users', user);
 
-                if (res.status === 201) {
-                    defaultState();
-                    toastRef.current.show({ severity: 'success', summary: 'Success', detail: res.data.message, life: 3000 });
-                }
-            } catch (error: any) {
-                const errorMessage = error?.response?.data?.message;
-                toastRef.current.show({ severity: 'error', summary: 'Error', detail: errorMessage, life: 3000 });
+            if (res.status === 201) {
+                defaultState();
+                toastRef.current.show({ severity: 'success', summary: 'Success', detail: res.data.message, life: 3000 });
             }
-        },
-        [user, defaultState],
-    );
+        } catch (error: any) {
+            const errorMessage = error?.response?.data?.message;
+            toastRef.current.show({ severity: 'error', summary: 'Error', detail: errorMessage, life: 3000 });
+        }
+    };
 
     return (
         <div className="col-12">
@@ -86,6 +93,10 @@ const CreateUsers = () => {
                     <div className="field col-12">
                         <label htmlFor="address">Address</label>
                         <InputTextarea id="address" name="address" value={user.address} rows={5} autoResize={true} onChange={onChangeHandler} required />
+                    </div>
+                    <div className="field col-12">
+                        <label htmlFor="role">Role</label>
+                        <Dropdown value={roleValue} options={role} optionLabel="name" onChange={e => setUser(prevState => ({ ...prevState, role: e.target.value.code }))} />
                     </div>
                 </div>
 

@@ -1,18 +1,49 @@
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import AppMenuitem from './AppMenuitem';
 import { LayoutContext } from './context/layoutcontext';
 import { MenuProvider } from './context/menucontext';
 import { AppMenuItem } from '../types/types';
 
+import Cookies from 'js-cookie';
+import { axiosInstance } from '../axiosInstance';
+
 const AppMenu = () => {
     const { layoutConfig } = useContext(LayoutContext);
+    const [role, setRole] = useState<'Admin' | 'User' | null>(null);
 
-    const model: AppMenuItem[] = [
+    const authentication = async () => {
+        try {
+            if (window.sessionStorage.getItem('token')) {
+                const token = JSON.parse(window.sessionStorage.getItem('token') as string);
+
+                if (token) {
+                    const response = await axiosInstance.get('/api/auth/verify', {
+                        headers: {
+                            'Authorization': token,
+                        },
+                    });
+                    const data = response.data;
+
+                    if (data) {
+                        setRole(data.message);
+                    }
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        authentication();
+    }, []);
+
+    const adminModel: AppMenuItem[] = [
         {
             label: 'Home',
-            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+            items: [{ label: 'Search Image', icon: 'pi pi-fw pi-images', to: '/' }],
         },
         {
             label: 'User',
@@ -20,34 +51,47 @@ const AppMenu = () => {
                 {
                     label: 'Create Users',
                     icon: 'pi pi-fw pi-user',
-                    to: '/users/create-users'
+                    to: '/users/create-users',
                 },
                 {
                     label: 'User Lists',
                     icon: 'pi pi-fw pi-users',
-                    to: '/users'
-                }
-            ]
+                    to: '/users',
+                },
+            ],
         },
         {
             label: 'Trade Mark',
-            items: [{ label: 'Create Trade Mark', icon: 'pi pi-fw pi-image', to: '/trade-mark/create-trade-mark' }]
+            items: [
+                { label: 'Create Trade Mark', icon: 'pi pi-fw pi-image', to: '/trade-mark/create-trade-mark' },
+                { label: 'Trade Mark List', icon: 'pi pi-fw pi-image', to: '/trade-mark' },
+            ],
+        },
+    ];
+
+    const userModel: AppMenuItem[] = [
+        {
+            label: 'Home',
+            items: [{ label: 'Search Image', icon: 'pi pi-fw pi-images', to: '/' }],
         },
         {
-            label: 'Record',
-            items: [
-                { label: 'Search Record', icon: 'pi pi-fw pi-search', to: '/record/search-record' },
-                { label: 'Search Image', icon: 'pi pi-fw pi-image', to: '/record/search-image' }
-            ]
-        }
+            label: 'Trade Mark',
+            items: [{ label: 'Trade Mark List', icon: 'pi pi-fw pi-image', to: '/trade-mark' }],
+        },
     ];
 
     return (
         <MenuProvider>
             <ul className="layout-menu">
-                {model.map((item, i) => {
-                    return !item?.seperator ? <AppMenuitem item={item} root={true} index={i} key={item.label} /> : <li className="menu-separator"></li>;
-                })}
+                {role === 'Admin' &&
+                    adminModel.map((item, i) => {
+                        return !item?.seperator ? <AppMenuitem item={item} root={true} index={i} key={item.label} /> : <li className="menu-separator"></li>;
+                    })}
+
+                {role === 'User' &&
+                    userModel.map((item, i) => {
+                        return !item?.seperator ? <AppMenuitem item={item} root={true} index={i} key={item.label} /> : <li className="menu-separator"></li>;
+                    })}
             </ul>
         </MenuProvider>
     );

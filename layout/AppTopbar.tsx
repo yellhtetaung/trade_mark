@@ -19,13 +19,14 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
     useImperativeHandle(ref, () => ({
         menubutton: menubuttonRef.current,
         topbarmenu: topbarmenuRef.current,
-        topbarmenubutton: topbarmenubuttonRef.current
+        topbarmenubutton: topbarmenubuttonRef.current,
     }));
 
     const singOut = async () => {
         const res = await axios.post('/api/sign-out', { withCredentials: true });
-        if (res.data.success) {
-            router.push('/');
+
+        if (res.status === 200) {
+            router.replace('/auth/login');
         }
     };
 
@@ -45,16 +46,17 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
             </button>
 
             <div ref={topbarmenuRef} className={classNames('layout-topbar-menu', { 'layout-topbar-menu-mobile-active': layoutState.profileSidebarVisible })}>
-                <button type="button" className="p-link layout-topbar-button">
+                {/* <button type="button" className="p-link layout-topbar-button">
                     <i className="pi pi-calendar"></i>
                     <span>Calendar</span>
                 </button>
                 <button type="button" className="p-link layout-topbar-button">
                     <i className="pi pi-user"></i>
                     <span>Profile</span>
-                </button>
+                </button> */}
                 <button type="button" className="p-link layout-topbar-button" onClick={singOut}>
                     <i className="pi pi-sign-out"></i>
+                    <span>Log Out</span>
                 </button>
             </div>
         </div>
