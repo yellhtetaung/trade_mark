@@ -26,6 +26,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
         const res = await axios.post('/api/sign-out', { withCredentials: true });
 
         if (res.status === 200) {
+            window.localStorage.removeItem('token');
             router.replace('/auth/login');
         }
     };

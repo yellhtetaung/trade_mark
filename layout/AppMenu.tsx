@@ -15,8 +15,8 @@ const AppMenu = () => {
 
     const authentication = async () => {
         try {
-            if (window.sessionStorage.getItem('token')) {
-                const token = JSON.parse(window.sessionStorage.getItem('token') as string);
+            if (window.localStorage.getItem('token')) {
+                const token = JSON.parse(window.localStorage.getItem('token') as string);
 
                 if (token) {
                     const response = await axiosInstance.get('/api/auth/verify', {

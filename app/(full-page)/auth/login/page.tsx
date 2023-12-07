@@ -31,7 +31,7 @@ const LoginPage = () => {
             const res = await axios.post('/api/login', { email, password }, { withCredentials: true });
 
             if (res.status === 200) {
-                window.sessionStorage.setItem('token', JSON.stringify(res.data.token));
+                window.localStorage.setItem('token', JSON.stringify(res.data.token));
                 router.replace('/');
             }
         } catch (error: any) {

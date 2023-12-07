@@ -1,11 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEventListener, useMountEffect, useUnmountEffect } from 'primereact/hooks';
 import React, { useContext, useEffect, useRef } from 'react';
 import { classNames } from 'primereact/utils';
-import AppFooter from './AppFooter';
 import AppSidebar from './AppSidebar';
 import AppTopbar from './AppTopbar';
 import AppConfig from './AppConfig';
@@ -21,7 +19,7 @@ const Layout = ({ children }: ChildContainerProps) => {
     const sidebarRef = useRef<HTMLDivElement>(null);
     const [bindMenuOutsideClickListener, unbindMenuOutsideClickListener] = useEventListener({
         type: 'click',
-        listener: (event) => {
+        listener: event => {
             const isOutsideClicked = !(
                 sidebarRef.current?.isSameNode(event.target as Node) ||
                 sidebarRef.current?.contains(event.target as Node) ||
@@ -32,7 +30,7 @@ const Layout = ({ children }: ChildContainerProps) => {
             if (isOutsideClicked) {
                 hideMenu();
             }
-        }
+        },
     });
 
     const pathname = usePathname();
@@ -44,7 +42,7 @@ const Layout = ({ children }: ChildContainerProps) => {
 
     const [bindProfileMenuOutsideClickListener, unbindProfileMenuOutsideClickListener] = useEventListener({
         type: 'click',
-        listener: (event) => {
+        listener: event => {
             const isOutsideClicked = !(
                 topbarRef.current?.topbarmenu?.isSameNode(event.target as Node) ||
                 topbarRef.current?.topbarmenu?.contains(event.target as Node) ||
@@ -55,7 +53,7 @@ const Layout = ({ children }: ChildContainerProps) => {
             if (isOutsideClicked) {
                 hideProfileMenu();
             }
-        }
+        },
     });
 
     const hideMenu = () => {
@@ -63,7 +61,7 @@ const Layout = ({ children }: ChildContainerProps) => {
             ...prevLayoutState,
             overlayMenuActive: false,
             staticMenuMobileActive: false,
-            menuHoverActive: false
+            menuHoverActive: false,
         }));
         unbindMenuOutsideClickListener();
         unblockBodyScroll();
@@ -72,7 +70,7 @@ const Layout = ({ children }: ChildContainerProps) => {
     const hideProfileMenu = () => {
         setLayoutState((prevLayoutState: LayoutState) => ({
             ...prevLayoutState,
-            profileSidebarVisible: false
+            profileSidebarVisible: false,
         }));
         unbindProfileMenuOutsideClickListener();
     };
@@ -123,7 +121,7 @@ const Layout = ({ children }: ChildContainerProps) => {
         'layout-overlay-active': layoutState.overlayMenuActive,
         'layout-mobile-active': layoutState.staticMenuMobileActive,
         'p-input-filled': layoutConfig.inputStyle === 'filled',
-        'p-ripple-disabled': !layoutConfig.ripple
+        'p-ripple-disabled': !layoutConfig.ripple,
     });
 
     return (
