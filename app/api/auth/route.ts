@@ -13,7 +13,9 @@ export async function GET(request: NextRequest) {
         });
         const data = response.data;
 
-        return NextResponse.json({ message: data.message });
+        if (data.message) {
+            return NextResponse.json({ message: data.message });
+        }
     } catch (err: any) {
         return NextResponse.json({ error: err.response.data.message }, { status: 500 });
     }
