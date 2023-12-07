@@ -17,15 +17,16 @@ export async function middleware(request: NextRequest) {
 
         const response = await fetch('http://localhost:3000/api/auth', {
             method: 'GET',
-            credentials: 'include',
             headers: {
                 Cookies: token,
             },
         });
         const data = await response.json();
 
-        if (url !== '/' && url !== '/trade-mark' && url !== '/auth/login' && data.message !== 'Admin') {
-            return NextResponse.redirect(new URL('/404', request.url));
+        if (data) {
+            if (url !== '/' && url !== '/trade-mark' && url !== '/auth/login' && data.message !== 'Admin') {
+                return NextResponse.redirect(new URL('/404', request.url));
+            }
         }
     }
 }

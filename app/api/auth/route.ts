@@ -13,10 +13,10 @@ export async function GET(request: NextRequest) {
         });
         const data = response.data;
 
-        if (data.message) {
+        if (response.status === 200) {
             return NextResponse.json({ message: data.message });
         }
     } catch (err: any) {
-        return NextResponse.json({ error: err.response.data.message }, { status: 500 });
+        return NextResponse.json({ error: 'Something Wrong' }, { status: 500 });
     }
 }
