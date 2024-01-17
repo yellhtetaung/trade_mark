@@ -125,7 +125,7 @@ const TradeMarkList = () => {
         }
 
         if (value === data.trademark_sample) {
-            return imageBodyTemplate(`https://${process.env.NEXT_PUBLIC_BACKEND_URL}/trademark_sample/${data.trademark_sample}`);
+            return imageBodyTemplate(`${process.env.NEXT_PUBLIC_BACKEND_URL}/trademark_sample/${data.trademark_sample}`);
         }
 
         if (value === data.attachment) {
@@ -134,7 +134,7 @@ const TradeMarkList = () => {
             }
 
             return (
-                <a href={`https://${process.env.NEXT_PUBLIC_BACKEND_URL}/attachment/${value}`} target="_blank">
+                <a href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/attachment/${value}`} target="_blank">
                     Download
                 </a>
             );

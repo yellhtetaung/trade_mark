@@ -129,7 +129,7 @@ const UpdateTradeMark = () => {
 
             const fileType = typeof trademark_sample === 'string' && trademark_sample.split('.')[1];
             const imageFile = trademark_sample && new File([trademark_sample], `${trademark_sample}`, { type: `image/${fileType}` });
-            const objectURL = trademark_sample && `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/trademark_sample/${trademark_sample}`;
+            const objectURL = trademark_sample && `${process.env.NEXT_PUBLIC_BACKEND_URL}/trademark_sample/${trademark_sample}`;
 
             const file = imageFile && objectURL && ({ name: imageFile.name, type: imageFile.type, size: imageFile.size, lastModified: imageFile.lastModified, webkitRelativePath: imageFile.webkitRelativePath, objectURL } as unknown as File);
 
