@@ -10,7 +10,7 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: process.env.NEXT_PUBLIC_BACKEND_URL,
+                hostname: 'tm007.z191638-s32tf.ps01.zwhhosting.com',
                 port: '',
                 pathname: '/trademark_sample/*',
             },
