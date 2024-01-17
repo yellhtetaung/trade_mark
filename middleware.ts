@@ -6,8 +6,6 @@ import { NextRequest } from 'next/server';
 export async function middleware(request: NextRequest) {
     const url = request.nextUrl.pathname;
 
-    console.log(request);
-
     if (!request.cookies.get('token')) {
         return NextResponse.redirect(new URL('/auth/login', request.url));
     }

@@ -9,9 +9,9 @@ const nextConfig = {
                 pathname: '/cms_media/module_img/**/**',
             },
             {
-                protocol: 'http',
-                hostname: '192.168.100.29',
-                port: '8000',
+                protocol: 'https',
+                hostname: process.env.NEXT_PUBLIC_BACKEND_URL,
+                port: '',
                 pathname: '/trademark_sample/*',
             },
         ],

@@ -59,6 +59,7 @@ const CreateUsers = () => {
                 toastRef.current.show({ severity: 'success', summary: 'Success', detail: res.data.message, life: 3000 });
             }
         } catch (error: any) {
+            console.log(error);
             const errorMessage = error?.response?.data?.message;
             toastRef.current.show({ severity: 'error', summary: 'Error', detail: errorMessage, life: 3000 });
         }

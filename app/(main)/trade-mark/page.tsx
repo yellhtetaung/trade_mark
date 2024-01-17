@@ -80,7 +80,7 @@ const TradeMarkList = () => {
 
     const imageBodyTemplate = (data: string) => <Image src={data} width={80} height={50} alt={data} className="shadow-2 border-round" quality={75} priority={true} />;
 
-    const dateBodyTemplate = (data: Date) => <time suppressHydrationWarning={true}>{new Intl.DateTimeFormat(['en-US', 'id']).format(data)}</time>;
+    const dateBodyTemplate = (data: Date) => <time suppressHydrationWarning={true}>{data.toLocaleDateString()}</time>;
 
     const submittionTypeTemplate = (data: SubmittionType) => {
         const submittionTypes: { [key: string]: string } = {
@@ -125,12 +125,16 @@ const TradeMarkList = () => {
         }
 
         if (value === data.trademark_sample) {
-            return imageBodyTemplate(`http://192.168.100.29:8000/trademark_sample/${data.trademark_sample}`);
+            return imageBodyTemplate(`https://${process.env.NEXT_PUBLIC_BACKEND_URL}/trademark_sample/${data.trademark_sample}`);
         }
 
         if (value === data.attachment) {
+            if (data.attachment === 'undefined') {
+                return <span>No Data</span>;
+            }
+
             return (
-                <a href={`http://192.168.100.29:8000/attachment/${value}`} target="_blank">
+                <a href={`https://${process.env.NEXT_PUBLIC_BACKEND_URL}/attachment/${value}`} target="_blank">
                     Download
                 </a>
             );
@@ -154,10 +158,22 @@ const TradeMarkList = () => {
                     filteredValue,
                 },
             });
-            const { data: trademark, totalTradeMark } = response.data;
+            const { data: tradeMarks, totalTradeMark } = response.data;
+
+            const newTradeMark = tradeMarks.map(({ re_filling_date, off_fill_date, granting_date, renewal_date, val_period, date_of_public, exp_date, created_at, ...tradeMark }: TradeMark) => ({
+                ...tradeMark,
+                re_filling_date: re_filling_date && new Date(re_filling_date),
+                off_fill_date: off_fill_date && new Date(off_fill_date),
+                granting_date: granting_date && new Date(granting_date),
+                renewal_date: renewal_date && new Date(renewal_date),
+                val_period: val_period && new Date(val_period),
+                date_of_public: date_of_public && new Date(date_of_public),
+                exp_date: exp_date && new Date(exp_date),
+                created_at: created_at && new Date(created_at),
+            }));
 
             // Update the users state with the retrieved user data
-            setData(trademark);
+            setData(newTradeMark);
 
             // Update the totalRecord state with the total number of users
             setTotalData(totalTradeMark);
@@ -166,6 +182,8 @@ const TradeMarkList = () => {
         } catch (error: any) {
             // Handle any errors that occur during the API request
             setData(undefined);
+
+            console.log(error);
 
             // Show an error toast notification with the error message
             toastRef.current.show({

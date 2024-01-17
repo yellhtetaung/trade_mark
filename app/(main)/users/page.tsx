@@ -44,7 +44,7 @@ const Users = () => {
 
     const activeBodyTemplate = (options: any): React.JSX.Element => {
         // Check if the body should be active
-        if (options.active === true || options.value === true) {
+        if (options.active === true || options.value === true || options.active === 1) {
             // Return a tag with "Active" value and "success" severity
             return <Tag value="Active" severity="success" />;
         }
@@ -60,8 +60,8 @@ const Users = () => {
     const dropDownEditor = (options: ColumnEditorOptions) => {
         // Define the active options for the dropdown
         const active = [
-            { name: 'Active', value: true },
-            { name: 'Inactive', value: false },
+            { name: 'Active', value: 1 },
+            { name: 'Inactive', value: 0 },
         ];
 
         const role = [
