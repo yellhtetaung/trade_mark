@@ -13,6 +13,6 @@ export async function POST(request: NextRequest) {
 
         return response;
     } catch (err: any) {
-        return NextResponse.json({ message: err.message }, { status: 500 });
+        return NextResponse.json({ message: err.message, error: err }, { status: 500 });
     }
 }

@@ -189,7 +189,7 @@ const TradeMarkList = () => {
             toastRef.current.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: error.response.data.message,
+                detail: error.response?.data.message,
                 life: 3000,
             });
         }

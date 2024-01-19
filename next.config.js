@@ -14,6 +14,12 @@ const nextConfig = {
                 port: '',
                 pathname: '/trademark_sample/*',
             },
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                port: '8000',
+                pathname: '/trademark_sample/*',
+            },
         ],
     },
     swcMinify: true,

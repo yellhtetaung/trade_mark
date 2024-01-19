@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     if (request.cookies.get('token')) {
         const token = request.cookies.get('token')?.value as string;
 
-        const response = await fetch('https://trade-mark.vercel.app/api/auth', {
+        const response = await fetch('http://localhost:3000/api/auth', {
             method: 'GET',
             headers: {
                 Cookies: token,
