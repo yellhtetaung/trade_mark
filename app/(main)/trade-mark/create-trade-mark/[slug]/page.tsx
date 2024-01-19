@@ -132,7 +132,7 @@ const UpdateTradeMark = () => {
     const fetchTradeMark = useCallback(async () => {
         try {
             const response = await axiosInstance.get(`/api/trade-mark/search?id=${slug}`);
-            const { re_filling_date, off_fill_date, granting_date, renewal_date, val_period, date_of_public, exp_date, trademark_sample, attachment, ...data } = response.data as TradeMark;
+            const { re_filling_date, off_fill_date, granting_date, renewal_date, val_period, date_of_public, exp_date, trademark_sample, attachment, submittion_type, ...data } = response.data as TradeMark;
 
             const fileType = typeof trademark_sample === 'string' && trademark_sample.split('.')[1];
             const imageFile = trademark_sample && new File([trademark_sample], `${trademark_sample}`, { type: `image/${fileType}` });
@@ -167,6 +167,13 @@ const UpdateTradeMark = () => {
                 val_period: val_period && new Date(val_period),
                 date_of_public: date_of_public && new Date(date_of_public),
                 exp_date: exp_date && new Date(exp_date),
+                submittion_type: submittion_type
+                    ? submittion_type
+                    : {
+                          Mark: false,
+                          OldMark: false,
+                          ReRegistration: false,
+                      },
             });
         } catch (error) {
             console.log(error);
@@ -174,7 +181,7 @@ const UpdateTradeMark = () => {
     }, [slug]);
 
     useEffect(() => {
-        fetchTradeMark();
+        fetchTradeMark().catch(error => console.log(error));
     }, [fetchTradeMark]);
 
     return (

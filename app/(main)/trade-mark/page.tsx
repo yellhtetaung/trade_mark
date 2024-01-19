@@ -109,7 +109,7 @@ const TradeMarkList = () => {
     const customTemplate = (data: TradeMark, column: ColumnBodyOptions) => {
         const value = data[column.field as keyof TradeMark];
 
-        if (value === undefined || value === null) {
+        if (value === undefined || value === null || value === '') {
             return null;
         }
 

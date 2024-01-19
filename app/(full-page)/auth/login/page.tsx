@@ -43,7 +43,7 @@ const LoginPage = () => {
         if (status === 'authenticated') {
             router.push('/');
         }
-    }, [status]);
+    }, [status, router]);
 
     return (
         <div className={containerClassName}>
