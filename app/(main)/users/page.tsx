@@ -10,7 +10,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Skeleton } from 'primereact/skeleton';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
-import { axiosInstance } from '../../../axiosInstance';
+import { axiosInstance } from '../../../utils/axiosInstance';
 import { InputText } from 'primereact/inputtext';
 import { User } from '../../../types/types';
 import { Button } from 'primereact/button';

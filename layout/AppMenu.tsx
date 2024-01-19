@@ -1,44 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AppMenuitem from './AppMenuitem';
-import { LayoutContext } from './context/layoutcontext';
 import { MenuProvider } from './context/menucontext';
 import { AppMenuItem } from '../types/types';
 
-import Cookies from 'js-cookie';
-import { axiosInstance } from '../axiosInstance';
+import { axiosInstance } from '../utils/axiosInstance';
+import { useSession } from 'next-auth/react';
 
 const AppMenu = () => {
-    const { layoutConfig } = useContext(LayoutContext);
     const [role, setRole] = useState<'Admin' | 'User' | null>(null);
 
-    const authentication = async () => {
-        try {
-            if (window.localStorage.getItem('token')) {
-                const token = JSON.parse(window.localStorage.getItem('token') as string);
-
-                if (token) {
-                    const response = await axiosInstance.get('/api/auth/verify', {
-                        headers: {
-                            'Authorization': token,
-                        },
-                    });
-                    const data = response.data;
-
-                    if (data) {
-                        setRole(data.message);
-                    }
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    useEffect(() => {
-        authentication();
-    }, []);
+    const { data } = useSession();
 
     const adminModel: AppMenuItem[] = [
         {
@@ -79,6 +52,13 @@ const AppMenu = () => {
             items: [{ label: 'Trade Mark List', icon: 'pi pi-fw pi-image', to: '/trade-mark' }],
         },
     ];
+
+    useEffect(() => {
+        if (data?.user) {
+            // @ts-ignore
+            setRole(data.user.role);
+        }
+    }, [data?.user]);
 
     return (
         <MenuProvider>

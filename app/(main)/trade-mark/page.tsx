@@ -15,9 +15,10 @@ import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 import { SubmittionType, TradeMark } from '../../../types/types';
-import { axiosInstance } from '../../../axiosInstance';
+import { axiosInstance } from '../../../utils/axiosInstance';
 import { Skeleton } from 'primereact/skeleton';
 import { Tag } from 'primereact/tag';
+import { useSession } from 'next-auth/react';
 
 type FilteredValue = 'trademark' | 'applicant' | 'created_at' | 'submittion_type' | 'null';
 
@@ -58,6 +59,7 @@ const TradeMarkList = () => {
         { field: 'nonlatin_char_trans', header: 'Non-Latin Characters and Transliteration' },
         { field: 'trans_mean', header: 'Translation / Meaning' },
         { field: 'color_claim', header: 'Color Claim' },
+        { field: 'supporting_docs', header: 'Supporting Docs' },
         { field: 're_filling_date', header: 'Re-Filling Date' },
         { field: 're_filling_WIPO_no', header: 'Re-Filling WIPO No' },
         { field: 'app_no', header: 'App No' },
@@ -75,7 +77,7 @@ const TradeMarkList = () => {
         { field: 'reason_exp', header: 'Reason Expires' },
         { field: 'tm2', header: 'TM 2' },
         { field: 'submittion_type', header: 'Submittion Type' },
-        { field: 'attachment', header: 'Atachment' },
+        { field: 'attachment', header: 'Attachment' },
     ];
 
     const imageBodyTemplate = (data: string) => <Image src={data} width={80} height={50} alt={data} className="shadow-2 border-round" quality={75} priority={true} />;
@@ -89,7 +91,7 @@ const TradeMarkList = () => {
             ReRegistration: 'Re-Registration',
         };
 
-        const tags: JSX.Element[] = [];
+        const tags: React.JSX.Element[] = [];
 
         for (const value in data) {
             if (data[value as keyof SubmittionType] && submittionTypes[value]) {
@@ -107,19 +109,19 @@ const TradeMarkList = () => {
     const customTemplate = (data: TradeMark, column: ColumnBodyOptions) => {
         const value = data[column.field as keyof TradeMark];
 
-        if (value === undefined) {
-            return <p>No data available</p>;
+        if (value === undefined || value === null) {
+            return null;
         }
 
         if (value instanceof Date) {
             return dateBodyTemplate(value as Date);
         }
 
-        if (typeof value === 'object' && value !== null) {
+        if (typeof value === 'object') {
             const { Mark, OldMark, ReRegistration } = value;
 
             if (Mark === false && OldMark === false && ReRegistration === false) {
-                return <span>No Data</span>;
+                return null;
             }
             return submittionTypeTemplate(value as SubmittionType);
         }
@@ -129,15 +131,7 @@ const TradeMarkList = () => {
         }
 
         if (value === data.attachment) {
-            if (data.attachment === 'undefined') {
-                return <span>No Data</span>;
-            }
-
-            return (
-                <a href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/attachment/${value}`} target="_blank">
-                    Download
-                </a>
-            );
+            return <a href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/download/attachment/${value}`}>Download</a>;
         }
 
         return <span>{value as string}</span>;
@@ -153,7 +147,10 @@ const TradeMarkList = () => {
                     pageSize,
                     searchField:
                         typeof searchField === 'object' && searchField.start_date instanceof Date && searchField.end_date instanceof Date
-                            ? { start_date: searchField.start_date.toLocaleDateString(), end_date: searchField.end_date.toLocaleDateString() } // create a new Date object for the timestamp
+                            ? {
+                                  start_date: searchField.start_date.toISOString(),
+                                  end_date: searchField.end_date.toISOString(),
+                              } // create a new Date object for the timestamp
                             : searchField,
                     filteredValue,
                 },
@@ -328,7 +325,10 @@ const TradeMarkList = () => {
                                     setFirst(0);
                                 }
 
-                                setSearchDate((prevState: SearchDate) => ({ ...prevState, start_date: e.target.value as Date }));
+                                setSearchDate((prevState: SearchDate) => ({
+                                    ...prevState,
+                                    start_date: e.target.value as Date,
+                                }));
                             }}
                             showIcon
                             placeholder="Start Date"
@@ -461,7 +461,12 @@ const TradeMarkList = () => {
                 fetchTradeMark(page, rows);
             }
         } catch (error: any) {
-            toastRef.current.show({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 3000 });
+            toastRef.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: error.response.data.message,
+                life: 3000,
+            });
         }
     };
 
@@ -469,7 +474,7 @@ const TradeMarkList = () => {
         // Memoize the fetchUsers and onFilterHandler functions
 
         if (searchField === '' && filteredValue === 'null') {
-            fetchTradeMark(page, rows);
+            fetchTradeMark(page, rows).catch(error => console.log(error));
         }
 
         // Call the memoized function
@@ -479,32 +484,14 @@ const TradeMarkList = () => {
         router.prefetch('/trade-mark/create-trade-mark/[slug]');
     }, [router]);
 
-    const authentication = async () => {
-        try {
-            if (window.localStorage.getItem('token')) {
-                const token = JSON.parse(window.localStorage.getItem('token') as string);
-
-                if (token) {
-                    const response = await axiosInstance.get('/api/auth/verify', {
-                        headers: {
-                            'Authorization': token,
-                        },
-                    });
-                    const data = response.data;
-
-                    if (data) {
-                        setRole(data.message);
-                    }
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
+    const { data: session } = useSession();
 
     useEffect(() => {
-        authentication();
-    }, []);
+        if (session?.user) {
+            // @ts-ignore
+            setRole(session.user.role);
+        }
+    }, [session?.user]);
 
     return (
         <div>
@@ -531,9 +518,10 @@ const TradeMarkList = () => {
                         setPage(e.page as number);
                     }}
                 >
-                    {role === 'Admin' && <Column rowEditor body={options => <Button icon="pi pi-fw pi-pencil" severity="warning" rounded text onClick={() => router.push(`/trade-mark/create-trade-mark/${options.id}`)} />} />}
+                    {role === 'Admin' && <Column align={'center'} rowEditor body={options => <Button icon="pi pi-fw pi-pencil" severity="warning" rounded text onClick={() => router.push(`/trade-mark/create-trade-mark/${options.id}`)} />} />}
                     {role === 'Admin' && (
                         <Column
+                            align={'center'}
                             body={options => (
                                 <Button
                                     icon="pi pi-fw pi-trash"
@@ -545,6 +533,7 @@ const TradeMarkList = () => {
                                             message: 'Are you sure you want to delete this record?',
                                             header: 'Delete Confirmation',
                                             icon: 'pi pi-info-circle',
+                                            contentClassName: 'border-noround',
                                             accept: () => deleteHandler(options.id),
                                             acceptClassName: 'p-button-danger',
                                             reject: () => {},
@@ -555,9 +544,17 @@ const TradeMarkList = () => {
                         />
                     )}
                     <Column field="id" header="No" alignHeader="center" align="center" body={(_, context) => (!isLoading ? context.rowIndex + 1 : <Skeleton />)} />
-                    {column.map((col, index) => (
-                        <Column alignHeader="center" align="center" field={col.field} key={index} header={col.header} body={(rowData, column) => (!isLoading ? customTemplate(rowData, column) : <Skeleton />)} />
-                    ))}
+                    {column.map((col, index) => {
+                        if (col.field === 'address' || col.field === 'applicant') {
+                            return <Column field={col.field} key={index} header={col.header} body={(rowData, column) => (!isLoading ? customTemplate(rowData, column) : <Skeleton />)} style={{ maxWidth: '15rem' }} />;
+                        }
+
+                        if (col.field === 'goods_services' || col.field === 'supporting_docs') {
+                            return <Column field={col.field} key={index} header={col.header} body={(rowData, column) => (!isLoading ? customTemplate(rowData, column) : <Skeleton />)} style={{ maxWidth: '30rem' }} />;
+                        }
+
+                        return <Column field={col.field} key={index} header={col.header} body={(rowData, column) => (!isLoading ? customTemplate(rowData, column) : <Skeleton />)} style={{ maxWidth: '10rem' }} />;
+                    })}
                 </DataTable>
             </div>
         </div>

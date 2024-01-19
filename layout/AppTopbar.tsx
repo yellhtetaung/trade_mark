@@ -1,16 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { classNames } from 'primereact/utils';
 import React, { forwardRef, useContext, useImperativeHandle, useRef } from 'react';
 import { AppTopbarRef } from '../types/types';
 import { LayoutContext } from './context/layoutcontext';
 
-import axios from 'axios';
+import { signOut } from 'next-auth/react';
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
-    const router = useRouter();
     const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } = useContext(LayoutContext);
     const menubuttonRef = useRef(null);
     const topbarmenuRef = useRef(null);
@@ -21,15 +19,6 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
         topbarmenu: topbarmenuRef.current,
         topbarmenubutton: topbarmenubuttonRef.current,
     }));
-
-    const singOut = async () => {
-        const res = await axios.post('/api/sign-out', { withCredentials: true });
-
-        if (res.status === 200) {
-            window.localStorage.removeItem('token');
-            router.replace('/auth/login');
-        }
-    };
 
     return (
         <div className="layout-topbar">
@@ -47,15 +36,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
             </button>
 
             <div ref={topbarmenuRef} className={classNames('layout-topbar-menu', { 'layout-topbar-menu-mobile-active': layoutState.profileSidebarVisible })}>
-                {/* <button type="button" className="p-link layout-topbar-button">
-                    <i className="pi pi-calendar"></i>
-                    <span>Calendar</span>
-                </button>
-                <button type="button" className="p-link layout-topbar-button">
-                    <i className="pi pi-user"></i>
-                    <span>Profile</span>
-                </button> */}
-                <button type="button" className="p-link layout-topbar-button" onClick={singOut}>
+                <button type="button" className="p-link layout-topbar-button" onClick={() => signOut()}>
                     <i className="pi pi-sign-out"></i>
                     <span>Log Out</span>
                 </button>

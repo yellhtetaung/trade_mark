@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import { useRouter } from 'next/navigation';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
@@ -10,48 +10,40 @@ import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 
 import axios from 'axios';
+import { signIn, useSession } from 'next-auth/react';
+import { axiosInstance } from '../../../../utils/axiosInstance';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
-    const [isEmailError, setIsEmailError] = useState(false);
-    const [isActiveError, setIsActiveError] = useState(false);
     const [password, setPassword] = useState('');
-    const [isPasswordError, setIsPasswordError] = useState(false);
+    const [isError, setIsError] = useState(false);
     const [checked, setChecked] = useState(false);
     const { layoutConfig } = useContext(LayoutContext);
 
     const router = useRouter();
     const containerClassName = classNames('surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden', { 'p-input-filled': layoutConfig.inputStyle === 'filled' });
 
-    const signIn = async () => {
-        setIsEmailError(false);
-        setIsPasswordError(false);
-        setIsActiveError(false);
-        try {
-            const res = await axios.post('/api/login', { email, password }, { withCredentials: true });
+    const { data: session, status } = useSession();
 
-            if (res.status === 200) {
-                window.localStorage.setItem('token', JSON.stringify(res.data.token));
-                router.replace('/');
-            }
-        } catch (error: any) {
-            const errorMessage: string = error.response.data.error;
+    const onLoginHandler = async () => {
+        setIsError(false);
 
-            if (errorMessage === 'This email does not registered') {
-                setIsEmailError(true);
-            }
+        const result = await signIn('credentials', {
+            email: email,
+            password: password,
+            redirect: false,
+        });
 
-            if (errorMessage === 'Incorrect password') {
-                setIsPasswordError(true);
-            }
-
-            if (errorMessage === 'This user is inactive') {
-                setIsActiveError(true);
-            }
-
-            console.log(error);
+        if (!result?.ok) {
+            setIsError(true);
         }
     };
+
+    useEffect(() => {
+        if (status === 'authenticated') {
+            router.push('/');
+        }
+    }, [status]);
 
     return (
         <div className={containerClassName}>
@@ -74,13 +66,11 @@ const LoginPage = () => {
                                     value={email}
                                     type="email"
                                     placeholder="Email address"
-                                    className={`w-full md:w-30rem ${isEmailError && 'p-invalid'}`}
+                                    className={`w-full md:w-30rem ${isError && 'p-invalid'}`}
                                     style={{ padding: '1rem' }}
                                     onChange={e => setEmail(e.target.value)}
                                     aria-describedby="email-help"
                                 />
-                                {isEmailError && <small className="email-help text-red-500">This email does not registered.</small>}
-                                {isActiveError && <small className="email-help text-red-500">This email is inactive.</small>}
                             </div>
 
                             <div className="flex flex-column mb-5">
@@ -93,11 +83,10 @@ const LoginPage = () => {
                                     onChange={e => setPassword(e.target.value)}
                                     placeholder="Password"
                                     toggleMask
-                                    className={`w-full ${isPasswordError && 'p-invalid'}`}
+                                    className={`w-full md:w-30rem ${isError && 'p-invalid'}`}
                                     inputClassName="w-full p-3 md:w-30rem"
                                     aria-describedby="password-help"
                                 ></Password>
-                                {isPasswordError && <small className="password-help text-red-500">Incorrect password.</small>}
                             </div>
 
                             <div className="flex align-items-center justify-content-between mb-5 gap-5">
@@ -109,7 +98,7 @@ const LoginPage = () => {
                                     Forgot password?
                                 </a>
                             </div>
-                            <Button label="Sign In" className="w-full p-3 text-xl" onClick={() => signIn()}></Button>
+                            <Button label="Sign In" className="w-full p-3 text-xl" onClick={() => onLoginHandler()}></Button>
                         </div>
                     </div>
                 </div>

@@ -10,7 +10,7 @@ import { Toast } from 'primereact/toast';
 
 import { User, ChangeHandler } from '../../../../types/types';
 
-import { axiosInstance } from '../../../../axiosInstance';
+import { axiosInstance } from '../../../../utils/axiosInstance';
 import { Dropdown } from 'primereact/dropdown';
 
 const CreateUsers = () => {

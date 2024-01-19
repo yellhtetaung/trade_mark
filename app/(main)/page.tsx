@@ -15,7 +15,7 @@ import { RadioButton, RadioButtonChangeEvent } from 'primereact/radiobutton';
 import { useRouter } from 'next/navigation';
 
 import { Category } from '../../types/types';
-import { axiosInstance } from '../../axiosInstance';
+import { axiosInstance } from '../../utils/axiosInstance';
 
 interface Recognition {
     id: number;

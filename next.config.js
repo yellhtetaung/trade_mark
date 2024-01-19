@@ -16,7 +16,7 @@ const nextConfig = {
             },
             {
                 protocol: 'http',
-                hostname: 'localhost',
+                hostname: process.env.NEXT_PUBLIC_BACKEND_HOST,
                 port: '8000',
                 pathname: '/trademark_sample/*',
             },
