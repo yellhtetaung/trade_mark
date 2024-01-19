@@ -14,15 +14,8 @@ const nextConfig = {
                 port: '',
                 pathname: '/trademark_sample/*',
             },
-            {
-                protocol: 'http',
-                hostname: process.env.NEXT_PUBLIC_BACKEND_HOST,
-                port: '8000',
-                pathname: '/trademark_sample/*',
-            },
         ],
     },
-    swcMinify: true,
 };
 
 module.exports = nextConfig;
